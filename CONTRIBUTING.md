@@ -29,7 +29,10 @@ Generated and hand-written code never share a file, so regeneration is a plain c
 
 4. Commit with the prefix that matches the API change (below), open a PR, merge when CI is green.
 
-The import restores the current version into `_version.py` (the zip always says `0.1.0`) and rejects zips that are not this SDK.
+The import restores the current version into `_version.py` (the zip always says `0.1.0`), rejects zips that
+are not this SDK, and replaces the generator's placeholder default host (`https://example.com`, emitted when
+no environment is configured) with a "base_url is required" error so a key can never be sent to a host we
+do not own. Once a production environment is configured in the generator, that step is a no-op.
 
 ## Commit messages
 

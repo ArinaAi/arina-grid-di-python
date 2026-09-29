@@ -1,16 +1,16 @@
 ---
 name: arina-document-intelligence-api-python-sdk
-description: "Python SDK for Arina Document Intelligence API. Use when writing Python code that calls Arina Document Intelligence API with the arina_grid_di package: installing it, constructing and authenticating the client, and calling API operations."
+description: "Python SDK for Arina Document Intelligence API. Use when writing Python code that calls Arina Document Intelligence API with the arina-grid-di package: installing it, constructing and authenticating the client, and calling API operations."
 ---
 
 # Arina Document Intelligence API Python SDK
 
-Generated Python client for Arina Document Intelligence API, published as `arina_grid_di`. Use the generated client instead of hand-writing HTTP requests.
+Generated Python client for Arina Document Intelligence API, published as `arina-grid-di`. Use the generated client instead of hand-writing HTTP requests.
 
 ## Install
 
 ```sh
-pip install arina_grid_di
+pip install arina-grid-di
 ```
 
 ## Client setup and authentication

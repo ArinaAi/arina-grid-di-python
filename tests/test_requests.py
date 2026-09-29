@@ -10,7 +10,13 @@ import json
 import httpx
 import pytest
 
-from arina_grid_di import NotFoundError, UnprocessableEntityError
+from arina_grid_di import (
+    ArinaDocumentIntelligenceAPI,
+    ArinaDocumentIntelligenceAPIError,
+    AsyncArinaDocumentIntelligenceAPI,
+    NotFoundError,
+    UnprocessableEntityError,
+)
 from arina_grid_di.types.extract_run import ExtractRun
 from arina_grid_di.types.extractor import Extractor
 from arina_grid_di.types.parse_run import ParseRun
@@ -189,3 +195,19 @@ class TestErrors:
         )
         with pytest.raises(UnprocessableEntityError):
             client.extraction.create_extract_run(file=b"x", config="{}")
+
+
+class TestClientConstruction:
+    def test_base_url_is_required(self, monkeypatch):
+        # No default host: a forgotten base_url must fail before any request (and any key) leaves.
+        monkeypatch.delenv("ARINA_BASE_URL", raising=False)
+        monkeypatch.delenv("ARINA_GRID_BASE_URL", raising=False)
+        with pytest.raises(ArinaDocumentIntelligenceAPIError, match="base_url"):
+            ArinaDocumentIntelligenceAPI(api_key_auth="k")
+        with pytest.raises(ArinaDocumentIntelligenceAPIError, match="base_url"):
+            AsyncArinaDocumentIntelligenceAPI(api_key_auth="k")
+
+    def test_base_url_from_environment(self, monkeypatch):
+        monkeypatch.setenv("ARINA_BASE_URL", "https://di.example.test")
+        client = ArinaDocumentIntelligenceAPI(api_key_auth="k")
+        assert str(client.base_url).rstrip("/") == "https://di.example.test"

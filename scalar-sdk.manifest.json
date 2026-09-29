@@ -2,15 +2,9 @@
   "name": "ArinaDocumentIntelligenceApi",
   "slug": "arinaDocumentIntelligenceApi",
   "generatorVersion": "0.35.2",
-  "servers": [
-    "{baseUrl}"
-  ],
-  "environments": {
-    "your_api_base_url_everything_before_the_resource_path_e_g_extract_runs": "https://demo.arina.ai/dev2230/bots/arina-grid-document-intelligence-bot"
-  },
-  "environmentOrder": [
-    "your_api_base_url_everything_before_the_resource_path_e_g_extract_runs"
-  ],
+  "servers": [],
+  "environments": {},
+  "environmentOrder": [],
   "auth": [
     "apiKey"
   ],

@@ -96,7 +96,9 @@ class ArinaDocumentIntelligenceAPI(SyncAPIClient):
         if base_url is None:
             base_url = os.environ.get("ARINA_BASE_URL")
         if base_url is None:
-            base_url = "https://demo.arina.ai/dev2230/bots/arina-grid-document-intelligence-bot"
+            raise ArinaDocumentIntelligenceAPIError(
+                "The base_url client option must be set either by passing base_url to the client or by setting the ARINA_BASE_URL environment variable"
+            )
         custom_headers_env = os.environ.get("ARINA_CUSTOM_HEADERS")
         if custom_headers_env is not None:
             parsed: dict[str, str] = {}
@@ -305,7 +307,9 @@ class AsyncArinaDocumentIntelligenceAPI(AsyncAPIClient):
         if base_url is None:
             base_url = os.environ.get("ARINA_BASE_URL")
         if base_url is None:
-            base_url = "https://demo.arina.ai/dev2230/bots/arina-grid-document-intelligence-bot"
+            raise ArinaDocumentIntelligenceAPIError(
+                "The base_url client option must be set either by passing base_url to the client or by setting the ARINA_BASE_URL environment variable"
+            )
         custom_headers_env = os.environ.get("ARINA_CUSTOM_HEADERS")
         if custom_headers_env is not None:
             parsed: dict[str, str] = {}

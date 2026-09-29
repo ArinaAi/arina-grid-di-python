@@ -5,7 +5,9 @@
 
 Generated paths are replaced; ours are untouched; preserved files (pyproject.toml,
 README.md, LICENSE, SECURITY.md) are created once, then only diffed. The version in
-pyproject.toml is written back into the generated _version.py. See CONTRIBUTING.md.
+pyproject.toml is written back into the generated _version.py, and the placeholder default
+base URL the generator emits when no environment is configured is replaced by an error
+(a client must never fall back to a host we do not own). See CONTRIBUTING.md.
 """
 
 from __future__ import annotations
@@ -145,6 +147,43 @@ def restore_version() -> str:
     return version
 
 
+PLACEHOLDER_BASE_URL = re.compile(
+    r'(if base_url is None:\n(?P<indent>\s+)base_url = os\.environ\.get\("(?P<env>[A-Z0-9_]+)"\)\n'
+    r'\s+if base_url is None:\n\s+)base_url = "https://example\.com"'
+)
+
+
+def patch_placeholder_base_url() -> str:
+    """Make base_url required when the generator emitted its placeholder default.
+
+    With no environment configured, generated clients fall back to https://example.com and
+    would send the API key there. Replace that fallback with the SDK's own error. Once a
+    production environment is configured the placeholder is gone and this is a no-op.
+    """
+    client_py = PACKAGE / "_client.py"
+    text = client_py.read_text(encoding="utf-8")
+    error = re.search(r"raise (\w+Error)\(", text)
+    if not error:
+        fail("_client.py: could not find the SDK error class")
+
+    def replacement(match: re.Match) -> str:
+        indent, env = match["indent"], match["env"]
+        return (
+            f"{match.group(1)}raise {error.group(1)}(\n"
+            f'{indent}    "The base_url client option must be set either by passing base_url to the client '
+            f'or by setting the {env} environment variable"\n'
+            f"{indent})"
+        )
+
+    text, count = PLACEHOLDER_BASE_URL.subn(replacement, text)
+    if count == 0:
+        return "generated client has a real default base URL; no patch needed"
+    if count != 2:
+        fail(f"_client.py: expected the placeholder in both sync and async clients, patched {count}")
+    client_py.write_text(text, encoding="utf-8")
+    return "placeholder default base URL replaced with a required-option error (sync + async)"
+
+
 def main(argv: list[str]) -> int:
     if len(argv) != 2:
         print(__doc__)
@@ -159,6 +198,7 @@ def main(argv: list[str]) -> int:
         created, differing = handle_preserved(source)
 
     version = restore_version()
+    patched = patch_placeholder_base_url()
 
     print("\nimport complete")
     print(f"  replaced (generated): {', '.join(replaced)}")
@@ -167,6 +207,7 @@ def main(argv: list[str]) -> int:
     if differing:
         print(f"  review (preserved, zip differs): {', '.join(differing)}")
     print(f"  version restored to {version} in _version.py")
+    print(f"  base url: {patched}")
     print("\nnext: pytest, then commit as feat:/fix: describing the API change.")
     return 0
 

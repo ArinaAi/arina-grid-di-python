@@ -34,7 +34,8 @@ pip install arina-grid-di
 ## Usage
 
 You need the base URL of the service you are using (Arina-hosted, or your organisation's
-own deployment) and the API key that goes with it.
+own deployment) and the API key that goes with it. Both are required: the client has no
+default host.
 
 ```python
 import json
