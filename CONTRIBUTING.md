@@ -9,8 +9,8 @@ internally.
 
 | Owner | Paths | Rule |
 | --- | --- | --- |
-| **Generator (Scalar)** | `src/arina_document_intelligence/**` except `lib/`; `api.md`; `SKILL.md`; `.claude/`; `scalar-sdk.manifest.json`; `tests/smoke-test.py`; `.gitignore` | Never edit. Replaced by `scripts/import_sdk.py`. Fix upstream: the OpenAPI document (API repo, `openapi/generate.py`) or the generator config. |
-| **This repo** | `src/arina_document_intelligence/lib/`; `tests/` (except `smoke-test.py`); `scripts/import_sdk.py`; `.github/` (workflows, `release-config.json`, `release-manifest.json`); `CHANGELOG.md`; `CONTRIBUTING.md`; `SECURITY.md` | Normal code review. New helpers go in new modules under `lib/`. |
+| **Generator (Scalar)** | `src/arina_grid_di/**` except `lib/`; `api.md`; `SKILL.md`; `.claude/`; `scalar-sdk.manifest.json`; `tests/smoke-test.py`; `.gitignore` | Never edit. Replaced by `scripts/import_sdk.py`. Fix upstream: the OpenAPI document (API repo, `openapi/generate.py`) or the generator config. |
+| **This repo** | `src/arina_grid_di/lib/`; `tests/` (except `smoke-test.py`); `scripts/import_sdk.py`; `.github/` (workflows, `release-config.json`, `release-manifest.json`); `CHANGELOG.md`; `CONTRIBUTING.md`; `SECURITY.md` | Normal code review. New helpers go in new modules under `lib/`. |
 | **Generated once, then this repo** | `pyproject.toml`; `README.md`; `LICENSE`; `SECURITY.md` | Import never overwrites them; it prints a diff when the generated version changed (usually a new runtime dependency) so the change can be ported by hand. |
 
 Generated and hand-written code never share a file, so regeneration is a plain copy with no merge.

@@ -15,7 +15,7 @@ Arina support contact, not this repository.
 ## Scope
 
 The SDK runtime (authentication headers, request construction, serialization, retries) and the
-helpers in `arina_document_intelligence.lib`. The generated client code is produced from the API's
+helpers in `arina_grid_di.lib`. The generated client code is produced from the API's
 OpenAPI document; issues that originate in the generator are forwarded upstream by us.
 
 ## Supported versions

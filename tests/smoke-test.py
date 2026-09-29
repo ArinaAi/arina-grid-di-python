@@ -14,7 +14,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any, Callable, TypedDict
 
-from arina_document_intelligence import ArinaDocumentIntelligenceAPI
+from arina_grid_di import ArinaDocumentIntelligenceAPI
 
 # The shared smoke-test runner injects base URL and credentials through the same
 # environment variables the generated client reads in normal use.

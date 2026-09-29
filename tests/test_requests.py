@@ -10,10 +10,10 @@ import json
 import httpx
 import pytest
 
-from arina_document_intelligence import NotFoundError, UnprocessableEntityError
-from arina_document_intelligence.types.extract_run import ExtractRun
-from arina_document_intelligence.types.extractor import Extractor
-from arina_document_intelligence.types.parse_run import ParseRun
+from arina_grid_di import NotFoundError, UnprocessableEntityError
+from arina_grid_di.types.extract_run import ExtractRun
+from arina_grid_di.types.extractor import Extractor
+from arina_grid_di.types.parse_run import ParseRun
 
 from .conftest import API_KEY, run_payload
 

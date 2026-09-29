@@ -19,11 +19,11 @@ import zipfile
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
-PACKAGE = REPO / "src" / "arina_document_intelligence"
+PACKAGE = REPO / "src" / "arina_grid_di"
 
 # Zip-owned paths, replaced wholesale (minus OURS_INSIDE_GENERATED).
 GENERATED = [
-    "src/arina_document_intelligence",
+    "src/arina_grid_di",
     "api.md",
     "SKILL.md",
     ".claude",
@@ -34,7 +34,7 @@ GENERATED = [
 
 # Hand-written code living under a generated directory.
 OURS_INSIDE_GENERATED = [
-    "src/arina_document_intelligence/lib",
+    "src/arina_grid_di/lib",
 ]
 
 # Created on first import, then owned here; diffed on later imports.
@@ -63,8 +63,8 @@ def extract(zip_path: Path, into: Path) -> Path:
     if len(candidates) != 1:
         fail(f"expected exactly one pyproject.toml in the zip, found {len(candidates)}")
     root = candidates[0]
-    if not (root / "src" / "arina_document_intelligence" / "_client.py").exists():
-        fail("zip does not contain src/arina_document_intelligence/_client.py")
+    if not (root / "src" / "arina_grid_di" / "_client.py").exists():
+        fail("zip does not contain src/arina_grid_di/_client.py")
     return root
 
 

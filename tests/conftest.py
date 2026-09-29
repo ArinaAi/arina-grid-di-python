@@ -11,7 +11,7 @@ from email.policy import HTTP
 import httpx
 import pytest
 
-from arina_document_intelligence import ArinaDocumentIntelligenceAPI, AsyncArinaDocumentIntelligenceAPI
+from arina_grid_di import ArinaDocumentIntelligenceAPI, AsyncArinaDocumentIntelligenceAPI
 
 BASE_URL = "http://api.test"
 API_KEY = "test-key"

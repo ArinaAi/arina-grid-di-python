@@ -1,4 +1,4 @@
-"""Polling helpers in arina_document_intelligence.lib."""
+"""Polling helpers in arina_grid_di.lib."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from itertools import chain, repeat
 import httpx
 import pytest
 
-from arina_document_intelligence.lib import (
+from arina_grid_di.lib import (
     RunFailedError,
     RunTimeoutError,
     wait_for_extract_run,

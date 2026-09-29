@@ -2,7 +2,7 @@
 # overwrites it and prints a diff when the generator's version changes.
 
 [project]
-name = "arina-document-intelligence"
+name = "arina-grid-di"
 version = "0.1.0"
 description = "Python SDK for the Arina Document Intelligence API: schema-driven extraction with spatial citations, layout parsing, and reusable extractors."
 readme = "README.md"
@@ -52,11 +52,11 @@ requires = ["hatchling>=1.18.0"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/arina_document_intelligence"]
+packages = ["src/arina_grid_di"]
 
 [tool.hatch.build.targets.sdist]
 include = [
-  "src/arina_document_intelligence",
+  "src/arina_grid_di",
   "README.md",
   "LICENSE",
   "api.md",
@@ -71,7 +71,7 @@ asyncio_default_fixture_loop_scope = "function"
 line-length = 120
 # Lint only hand-written code; generated code is replaced on every import.
 include = [
-  "src/arina_document_intelligence/lib/**/*.py",
+  "src/arina_grid_di/lib/**/*.py",
   "tests/test_*.py",
   "tests/conftest.py",
   "scripts/**/*.py",

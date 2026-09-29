@@ -26,7 +26,7 @@ The full API of this library can be found in [api.md](./api.md).
 ## Installation
 
 ```sh
-pip install arina-document-intelligence
+pip install arina-grid-di
 ```
 
 <br />
@@ -39,7 +39,7 @@ own deployment) and the API key that goes with it.
 ```python
 import json
 
-from arina_document_intelligence import ArinaDocumentIntelligenceAPI
+from arina_grid_di import ArinaDocumentIntelligenceAPI
 
 client = ArinaDocumentIntelligenceAPI(
     api_key_auth="<your key>",
@@ -75,11 +75,11 @@ See the [API reference](./api.md) for every available operation.
 
 ## Waiting for a run
 
-`arina_document_intelligence.lib` adds helpers that poll a run until it reaches a
+`arina_grid_di.lib` adds helpers that poll a run until it reaches a
 terminal status (`PROCESSED`, `FAILED`, `CANCELLED`), with backoff and a timeout:
 
 ```python
-from arina_document_intelligence.lib import wait_for_extract_run
+from arina_grid_di.lib import wait_for_extract_run
 
 run = wait_for_extract_run(client, run.id, timeout=120)
 
@@ -111,7 +111,7 @@ Every client has an `Async` counterpart (`AsyncArinaDocumentIntelligenceAPI`) ex
 ```python
 import asyncio
 
-from arina_document_intelligence import AsyncArinaDocumentIntelligenceAPI
+from arina_grid_di import AsyncArinaDocumentIntelligenceAPI
 
 
 async def main() -> None:
@@ -146,7 +146,7 @@ Declared schemes:
 Non-success responses throw generated API errors. Error objects expose status, headers, response body, and request metadata where the target runtime supports it.
 
 ```python
-from arina_document_intelligence import APIStatusError
+from arina_grid_di import APIStatusError
 
 try:
     extraction = client.extraction.create_extract_run(
@@ -167,7 +167,7 @@ Documented error statuses: `400`, `404`, `409`, `422`, `503`.
 Configure the generated client by setting any of these options when you create it.
 
 ```python
-from arina_document_intelligence import ArinaDocumentIntelligenceAPI
+from arina_grid_di import ArinaDocumentIntelligenceAPI
 
 client = ArinaDocumentIntelligenceAPI(
     timeout=60.0,
@@ -202,7 +202,7 @@ Generated clients support request timeouts and retry temporary failures such as 
 ## Logging
 
 - Set the `ARINA_LOG` environment variable to `info` or `debug` to enable HTTP logging.
-- Logs are emitted through the standard `logging` module under the `arina_document_intelligence` logger.
+- Logs are emitted through the standard `logging` module under the `arina_grid_di` logger.
 
 <br />
 
@@ -214,7 +214,7 @@ Generated clients support request timeouts and retry temporary failures such as 
 
 ## Contributing
 
-Client code under `src/arina_document_intelligence/` (except `lib/`) is generated from the
+Client code under `src/arina_grid_di/` (except `lib/`) is generated from the
 API's OpenAPI document; helpers, tests and release automation are maintained here. See
 [CONTRIBUTING.md](./CONTRIBUTING.md). Security reports: [SECURITY.md](./SECURITY.md).
 

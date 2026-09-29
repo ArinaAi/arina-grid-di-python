@@ -1,16 +1,16 @@
 ---
 name: arina-document-intelligence-api-python-sdk
-description: "Python SDK for Arina Document Intelligence API. Use when writing Python code that calls Arina Document Intelligence API with the arina-document-intelligence package: installing it, constructing and authenticating the client, and calling API operations."
+description: "Python SDK for Arina Document Intelligence API. Use when writing Python code that calls Arina Document Intelligence API with the arina_grid_di package: installing it, constructing and authenticating the client, and calling API operations."
 ---
 
 # Arina Document Intelligence API Python SDK
 
-Generated Python client for Arina Document Intelligence API, published as `arina-document-intelligence`. Use the generated client instead of hand-writing HTTP requests.
+Generated Python client for Arina Document Intelligence API, published as `arina_grid_di`. Use the generated client instead of hand-writing HTTP requests.
 
 ## Install
 
 ```sh
-pip install arina-document-intelligence
+pip install arina_grid_di
 ```
 
 ## Client setup and authentication
@@ -18,7 +18,7 @@ pip install arina-document-intelligence
 ```python
 import os
 
-from arina_document_intelligence import ArinaDocumentIntelligenceAPI
+from arina_grid_di import ArinaDocumentIntelligenceAPI
 
 client = ArinaDocumentIntelligenceAPI(
     api_key_auth=os.environ.get("API_KEY_AUTH"),
@@ -34,7 +34,7 @@ Provide credentials using the options below. Environment variables are read auto
 ```python
 import os
 
-from arina_document_intelligence import ArinaDocumentIntelligenceAPI
+from arina_grid_di import ArinaDocumentIntelligenceAPI
 
 client = ArinaDocumentIntelligenceAPI(
     api_key_auth=os.environ.get("API_KEY_AUTH"),
@@ -55,7 +55,7 @@ Method names, parameter shapes, and response types are generated from the API de
 Non-success responses throw generated API errors. Error objects expose status, headers, response body, and request metadata where the target runtime supports it.
 
 ```python
-from arina_document_intelligence import APIStatusError
+from arina_grid_di import APIStatusError
 
 try:
     extraction = client.extraction.create_extract_run(

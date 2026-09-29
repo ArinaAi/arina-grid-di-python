@@ -21,10 +21,10 @@
   ],
   "packages": {
     ".": {
-      "package-name": "arina-document-intelligence",
+      "package-name": "arina-grid-di",
       "changelog-path": "CHANGELOG.md",
       "extra-files": [
-        "src/arina_document_intelligence/_version.py"
+        "src/arina_grid_di/_version.py"
       ]
     }
   }

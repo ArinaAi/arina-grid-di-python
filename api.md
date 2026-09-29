@@ -27,7 +27,7 @@ Complete reference of every operation, grouped by resource. See [the README](./R
 ```python
 import os
 
-from arina_document_intelligence import ArinaDocumentIntelligenceAPI
+from arina_grid_di import ArinaDocumentIntelligenceAPI
 
 client = ArinaDocumentIntelligenceAPI(
     api_key_auth=os.environ.get("API_KEY_AUTH"),
@@ -46,8 +46,8 @@ Accept a document and return a run to poll. `config.config` is either an inline 
 
 | Direction | Type |
 | --- | --- |
-| Request | [`ExtractionCreateExtractRunParams`](./src/arina_document_intelligence/types/extraction_create_extract_run_params.py) |
-| Response | [`ExtractRun`](./src/arina_document_intelligence/types/extract_run.py) |
+| Request | [`ExtractionCreateExtractRunParams`](./src/arina_grid_di/types/extraction_create_extract_run_params.py) |
+| Response | [`ExtractRun`](./src/arina_grid_di/types/extract_run.py) |
 
 ```python
 extraction = client.extraction.create_extract_run(
@@ -62,7 +62,7 @@ Report a run's status, and its output with citations once finished.
 
 | Direction | Type |
 | --- | --- |
-| Response | [`ExtractRun`](./src/arina_document_intelligence/types/extract_run.py) |
+| Response | [`ExtractRun`](./src/arina_grid_di/types/extract_run.py) |
 
 ```python
 extraction = client.extraction.retrieve_extract_run(
@@ -92,8 +92,8 @@ Read page 1 into layout blocks, tables (HTML) and markdown — no schema. `202`:
 
 | Direction | Type |
 | --- | --- |
-| Request | [`ParseCreateRunParams`](./src/arina_document_intelligence/types/parse_create_run_params.py) |
-| Response | [`ParseRun`](./src/arina_document_intelligence/types/parse_run.py) |
+| Request | [`ParseCreateRunParams`](./src/arina_grid_di/types/parse_create_run_params.py) |
+| Response | [`ParseRun`](./src/arina_grid_di/types/parse_run.py) |
 
 ```python
 parse = client.parse.create_run(
@@ -108,7 +108,7 @@ Report a run's status, and its parsed output once finished.
 
 | Direction | Type |
 | --- | --- |
-| Response | [`ParseRun`](./src/arina_document_intelligence/types/parse_run.py) |
+| Response | [`ParseRun`](./src/arina_grid_di/types/parse_run.py) |
 
 ```python
 parse = client.parse.retrieve_run(
@@ -138,8 +138,8 @@ Save a named, versioned extraction configuration. The schema is validated here, 
 
 | Direction | Type |
 | --- | --- |
-| Request | [`ExtractorCreateParams`](./src/arina_document_intelligence/types/extractor_create_params.py) |
-| Response | [`Extractor`](./src/arina_document_intelligence/types/extractor.py) |
+| Request | [`ExtractorCreateParams`](./src/arina_grid_di/types/extractor_create_params.py) |
+| Response | [`Extractor`](./src/arina_grid_di/types/extractor.py) |
 
 ```python
 extractor = client.extractors.create(
@@ -160,8 +160,8 @@ A tenant's extractors, `ACTIVE` by default. `status=ARCHIVED|all` to widen.
 
 | Direction | Type |
 | --- | --- |
-| Request | [`ExtractorListParams`](./src/arina_document_intelligence/types/extractor_list_params.py) |
-| Response | [`ExtractorList`](./src/arina_document_intelligence/types/extractor_list.py) |
+| Request | [`ExtractorListParams`](./src/arina_grid_di/types/extractor_list_params.py) |
+| Response | [`ExtractorList`](./src/arina_grid_di/types/extractor_list.py) |
 
 ```python
 extractor = client.extractors.list(
@@ -175,8 +175,8 @@ The current version of one extractor.
 
 | Direction | Type |
 | --- | --- |
-| Request | [`ExtractorRetrieveParams`](./src/arina_document_intelligence/types/extractor_retrieve_params.py) |
-| Response | [`Extractor`](./src/arina_document_intelligence/types/extractor.py) |
+| Request | [`ExtractorRetrieveParams`](./src/arina_grid_di/types/extractor_retrieve_params.py) |
+| Response | [`Extractor`](./src/arina_grid_di/types/extractor.py) |
 
 ```python
 extractor = client.extractors.retrieve(
@@ -191,8 +191,8 @@ Rename, describe or reconfigure. Only a `config` change bumps the version. Send 
 
 | Direction | Type |
 | --- | --- |
-| Request | [`ExtractorUpdateParams`](./src/arina_document_intelligence/types/extractor_update_params.py) |
-| Response | [`Extractor`](./src/arina_document_intelligence/types/extractor.py) |
+| Request | [`ExtractorUpdateParams`](./src/arina_grid_di/types/extractor_update_params.py) |
+| Response | [`Extractor`](./src/arina_grid_di/types/extractor.py) |
 
 ```python
 extractor = client.extractors.update(
@@ -212,8 +212,8 @@ Archive by default (record and versions kept, new runs refused). `permanent=true
 
 | Direction | Type |
 | --- | --- |
-| Request | [`ExtractorDeleteParams`](./src/arina_document_intelligence/types/extractor_delete_params.py) |
-| Response | [`ExtractorDeleteResponse`](./src/arina_document_intelligence/types/extractor_delete_response.py) |
+| Request | [`ExtractorDeleteParams`](./src/arina_grid_di/types/extractor_delete_params.py) |
+| Response | [`ExtractorDeleteResponse`](./src/arina_grid_di/types/extractor_delete_response.py) |
 
 ```python
 extractor = client.extractors.delete(
@@ -235,8 +235,8 @@ Every immutable config snapshot, newest first.
 
 | Direction | Type |
 | --- | --- |
-| Request | [`VersionListParams`](./src/arina_document_intelligence/types/extractors/version_list_params.py) |
-| Response | [`ExtractorVersionList`](./src/arina_document_intelligence/types/extractors/extractor_version_list.py) |
+| Request | [`VersionListParams`](./src/arina_grid_di/types/extractors/version_list_params.py) |
+| Response | [`ExtractorVersionList`](./src/arina_grid_di/types/extractors/extractor_version_list.py) |
 
 ```python
 version = client.extractors.versions.list(
@@ -251,8 +251,8 @@ One config snapshot by number.
 
 | Direction | Type |
 | --- | --- |
-| Request | [`VersionRetrieveParams`](./src/arina_document_intelligence/types/extractors/version_retrieve_params.py) |
-| Response | [`ExtractorVersion`](./src/arina_document_intelligence/types/extractors/extractor_version.py) |
+| Request | [`VersionRetrieveParams`](./src/arina_grid_di/types/extractors/version_retrieve_params.py) |
+| Response | [`ExtractorVersion`](./src/arina_grid_di/types/extractors/extractor_version.py) |
 
 ```python
 version = client.extractors.versions.retrieve(
