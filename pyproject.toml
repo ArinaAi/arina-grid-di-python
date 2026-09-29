@@ -1,0 +1,81 @@
+# Owned by this repo (generated once, then maintained here). scripts/import_sdk.py never
+# overwrites it and prints a diff when the generator's version changes.
+
+[project]
+name = "arina-document-intelligence"
+version = "0.1.0"
+description = "Python SDK for the Arina Document Intelligence API: schema-driven extraction with spatial citations, layout parsing, and reusable extractors."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Arina" },
+]
+requires-python = ">= 3.9"
+keywords = ["arina", "document-intelligence", "ocr", "extraction", "sdk"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Operating System :: OS Independent",
+  "Typing :: Typed",
+]
+dependencies = [
+  "httpx>=0.23.0, <1",
+  "pydantic>=1.9.0, <3",
+  "typing-extensions>=4.14, <5",
+  "anyio>=3.5.0, <5",
+  "distro>=1.7.0, <2",
+  "sniffio",
+]
+
+[project.urls]
+Homepage = "https://arina.ai"
+Repository = "https://github.com/ArinaAi/arina-grid-di-python"
+Changelog = "https://github.com/ArinaAi/arina-grid-di-python/blob/main/CHANGELOG.md"
+Issues = "https://github.com/ArinaAi/arina-grid-di-python/issues"
+
+[project.optional-dependencies]
+aiohttp = ["aiohttp", "httpx_aiohttp>=0.1.9"]
+# Repo tooling only.
+dev = [
+  "pytest>=8",
+  "pytest-asyncio>=0.23",
+  "ruff>=0.6",
+  "build>=1.2",
+  "twine>=6.1",
+]
+
+[build-system]
+requires = ["hatchling>=1.18.0"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/arina_document_intelligence"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/arina_document_intelligence",
+  "README.md",
+  "LICENSE",
+  "api.md",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+line-length = 120
+# Lint only hand-written code; generated code is replaced on every import.
+include = [
+  "src/arina_document_intelligence/lib/**/*.py",
+  "tests/test_*.py",
+  "tests/conftest.py",
+  "scripts/**/*.py",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
