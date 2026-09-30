@@ -108,7 +108,8 @@ jobs:
 
   publish-testpypi:
     needs: build
-    if: needs.build.outputs.index == 'testpypi'
+    # !cancelled(): the skipped `release` job (manual runs) would otherwise skip this job too.
+    if: ${{ !cancelled() && needs.build.result == 'success' && needs.build.outputs.index == 'testpypi' }}
     runs-on: ubuntu-latest
     environment:
       name: testpypi
@@ -126,7 +127,8 @@ jobs:
 
   publish-pypi:
     needs: build
-    if: needs.build.outputs.index == 'pypi'
+    # !cancelled(): the skipped `release` job (manual runs) would otherwise skip this job too.
+    if: ${{ !cancelled() && needs.build.result == 'success' && needs.build.outputs.index == 'pypi' }}
     runs-on: ubuntu-latest
     environment:
       name: pypi
