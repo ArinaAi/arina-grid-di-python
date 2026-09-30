@@ -1,0 +1,141 @@
+# Release: version PR, tag, GitHub Release, PyPI publish.
+#
+# push to main (feat/fix merged)   -> release job opens/updates PR "chore(release): vX.Y.Z"
+# push to main (release PR merged) -> release job tags + creates the GitHub Release, then build + publish
+# manual run                       -> build + publish a tag (or main) to the chosen index
+#
+# Versioning and changelog: release-please (config in .github/release-config.json).
+# Publishing runs in this workflow because GitHub does not trigger workflows from events created with
+# GITHUB_TOKEN, and PyPI Trusted Publishing rejects reusable workflows.
+# Automatic publishes go to TestPyPI unless repository variable RELEASE_INDEX == "pypi".
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      index:
+        description: Target index
+        type: choice
+        options: [testpypi, pypi]
+        default: testpypi
+      ref:
+        description: Tag to build (empty = main, no tag check)
+        type: string
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      created: ${{ steps.release.outputs.release_created }}
+      tag: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: .github/release-config.json
+          manifest-file: .github/release-manifest.json
+
+  build:
+    needs: release
+    # !cancelled(): run on manual dispatch even though `release` is skipped.
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || needs.release.outputs.created == 'true') }}
+    runs-on: ubuntu-latest
+    outputs:
+      index: ${{ steps.plan.outputs.index }}
+      version: ${{ steps.plan.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || needs.release.outputs.tag || github.ref }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build
+        run: python -m pip install --upgrade pip build twine && python -m build
+
+      - name: Check metadata
+        run: twine check --strict dist/*
+
+      - name: Plan publish (index, version == tag)
+        id: plan
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_INDEX: ${{ inputs.index }}
+          INPUT_REF: ${{ inputs.ref }}
+          RELEASE_TAG: ${{ needs.release.outputs.tag }}
+          RELEASE_INDEX: ${{ vars.RELEASE_INDEX }}
+        run: |
+          set -eu
+          version="$(python - <<'EOF'
+          import re, pathlib
+          print(re.search(r'^version\s*=\s*"([^"]+)"', pathlib.Path("pyproject.toml").read_text(), re.M).group(1))
+          EOF
+          )"
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            index="$INPUT_INDEX"; tag="$INPUT_REF"
+          else
+            if [ "$RELEASE_INDEX" = "pypi" ]; then index="pypi"; else index="testpypi"; fi
+            tag="$RELEASE_TAG"
+          fi
+          if [ -n "$tag" ] && [ "${tag#v}" != "$version" ]; then
+            echo "::error::tag $tag does not match package version $version"; exit 1
+          fi
+          { echo "version=$version"; echo "index=$index"; } >> "$GITHUB_OUTPUT"
+          echo "- version \`$version\` · tag \`${tag:-none}\` · index **$index**" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  publish-testpypi:
+    needs: build
+    if: needs.build.outputs.index == 'testpypi'
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/project/arina-grid-di/${{ needs.build.outputs.version }}/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+
+  publish-pypi:
+    needs: build
+    if: needs.build.outputs.index == 'pypi'
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/arina-grid-di/${{ needs.build.outputs.version }}/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
