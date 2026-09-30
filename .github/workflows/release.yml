@@ -59,7 +59,7 @@ jobs:
       index: ${{ steps.plan.outputs.index }}
       version: ${{ steps.plan.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || needs.release.outputs.tag || github.ref }}
 
