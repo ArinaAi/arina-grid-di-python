@@ -43,7 +43,7 @@ import json
 from arina_grid_di import ArinaDocumentIntelligenceAPI
 
 client = ArinaDocumentIntelligenceAPI(
-    api_key_auth="<your key>",
+    api_key="<your key>",
     base_url="https://<your base url>",
 )
 
@@ -134,11 +134,11 @@ Pass credentials to the generated client constructor. Environment variables are 
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `api_key_auth` | `string \| provider` | - | Credential for the ApiKeyAuth scheme. Defaults to API_KEY_AUTH. |
+| `api_key` | `string \| provider` | - | Credential for the ApiKey scheme. Defaults to `ARINA_GRID_API_KEY`. |
 
 Declared schemes:
 
-- `ApiKeyAuth` API key in header `X-API-Key`
+- `ApiKey` API key in header `X-API-Key`
 
 <br />
 
@@ -178,7 +178,7 @@ client = ArinaDocumentIntelligenceAPI(
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `api_key_auth` | `str \| None` | `os.environ.get("API_KEY_AUTH")` | Credential for the ApiKeyAuth scheme. |
+| `api_key` | `str \| None` | `os.environ.get("ARINA_GRID_API_KEY")` | Credential for the ApiKey scheme. |
 | `base_url` | `str \| httpx.URL \| None` | - | Override the default API base URL. |
 | `timeout` | `float \| Timeout \| None` | `60.0` | Maximum time in seconds to wait for a response before aborting a request. |
 | `max_retries` | `int` | `2` | Number of retries for temporary failures. |

@@ -21,13 +21,13 @@ import os
 from arina_grid_di import ArinaDocumentIntelligenceAPI
 
 client = ArinaDocumentIntelligenceAPI(
-    api_key_auth=os.environ.get("API_KEY_AUTH"),
+    api_key=os.environ.get("ARINA_GRID_API_KEY"),
 )
 ```
 
 Provide credentials using the options below. Environment variables are read automatically when the target runtime supports them:
 
-- `api_key_auth` (env: `API_KEY_AUTH`) — Credential for the ApiKeyAuth scheme.
+- `api_key` (env: `ARINA_GRID_API_KEY`) — Credential for the ApiKey scheme.
 
 ## Calling operations
 
@@ -37,7 +37,7 @@ import os
 from arina_grid_di import ArinaDocumentIntelligenceAPI
 
 client = ArinaDocumentIntelligenceAPI(
-    api_key_auth=os.environ.get("API_KEY_AUTH"),
+    api_key=os.environ.get("ARINA_GRID_API_KEY"),
 )
 
 extraction = client.extraction.create_extract_run(

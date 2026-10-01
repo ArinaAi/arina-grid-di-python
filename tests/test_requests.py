@@ -198,16 +198,25 @@ class TestErrors:
 
 
 class TestClientConstruction:
+    def test_credential_comes_from_arina_grid_api_key_only(self, monkeypatch):
+        # The env var is namespaced; an unrelated API_KEY in the environment must never be picked up.
+        monkeypatch.setenv("ARINA_GRID_BASE_URL", "https://di.example.test")
+        monkeypatch.setenv("API_KEY", "must-not-be-read")
+        monkeypatch.delenv("ARINA_GRID_API_KEY", raising=False)
+        with pytest.raises(ArinaDocumentIntelligenceAPIError, match="ARINA_GRID_API_KEY"):
+            ArinaDocumentIntelligenceAPI()
+        monkeypatch.setenv("ARINA_GRID_API_KEY", "from-env")
+        assert ArinaDocumentIntelligenceAPI().api_key == "from-env"
+
     def test_base_url_is_required(self, monkeypatch):
         # No default host: a forgotten base_url must fail before any request (and any key) leaves.
-        monkeypatch.delenv("ARINA_BASE_URL", raising=False)
         monkeypatch.delenv("ARINA_GRID_BASE_URL", raising=False)
         with pytest.raises(ArinaDocumentIntelligenceAPIError, match="base_url"):
-            ArinaDocumentIntelligenceAPI(api_key_auth="k")
+            ArinaDocumentIntelligenceAPI(api_key="k")
         with pytest.raises(ArinaDocumentIntelligenceAPIError, match="base_url"):
-            AsyncArinaDocumentIntelligenceAPI(api_key_auth="k")
+            AsyncArinaDocumentIntelligenceAPI(api_key="k")
 
     def test_base_url_from_environment(self, monkeypatch):
-        monkeypatch.setenv("ARINA_BASE_URL", "https://di.example.test")
-        client = ArinaDocumentIntelligenceAPI(api_key_auth="k")
+        monkeypatch.setenv("ARINA_GRID_BASE_URL", "https://di.example.test")
+        client = ArinaDocumentIntelligenceAPI(api_key="k")
         assert str(client.base_url).rstrip("/") == "https://di.example.test"
