@@ -30,7 +30,10 @@ Generated and hand-written code never share a file, so regeneration is a plain c
 4. Commit with the prefix that matches the API change (below), open a PR, merge when CI is green.
 
 The import restores the current version into `_version.py` (the zip always says `0.1.0`), rejects zips that
-are not this SDK, and replaces the generator's placeholder default host (`https://example.com`, emitted when
+are not this SDK, rewrites the distribution name in shipped docs to the one in `pyproject.toml` and the
+environment variables the generator derives from the API title and the security scheme (`API_KEY`,
+`ARINA_BASE_URL`, `ARINA_LOG`, `ARINA_CUSTOM_HEADERS`) to the `ARINA_GRID_*` family, and replaces the
+generator's placeholder default host (`https://example.com`, emitted when
 no environment is configured) with a "base_url is required" error so a key can never be sent to a host we
 do not own. Once a production environment is configured in the generator, that step is a no-op.
 
@@ -61,5 +64,4 @@ routes parse. `tests/smoke-test.py` is the generator's live reachability check; 
 
 ## Known follow-ups
 
-- Regenerate with the generator config set to `readEnv: ARINA_GRID_API_KEY` and `defaultEnvPrefix: ARINA_GRID`; the current client reads `API_KEY_AUTH` / `ARINA_BASE_URL` and defaults to a development host.
 - Confirm the copyright holder in `LICENSE` is the legal entity name.

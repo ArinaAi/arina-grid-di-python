@@ -5,9 +5,12 @@
 
 Generated paths are replaced; ours are untouched; preserved files (pyproject.toml,
 README.md, LICENSE, SECURITY.md) are created once, then only diffed. The version in
-pyproject.toml is written back into the generated _version.py, and the placeholder default
-base URL the generator emits when no environment is configured is replaced by an error
-(a client must never fall back to a host we do not own). See CONTRIBUTING.md.
+pyproject.toml is written back into the generated _version.py; environment variable names
+are rewritten to the ARINA_GRID_* family and the distribution name in shipped docs to the
+one in pyproject.toml (the generator derives both from the API title and offers no setting);
+and the placeholder default base URL the generator emits when no environment is configured
+is replaced by an error (a client must never fall back to a host we do not own).
+See CONTRIBUTING.md.
 """
 
 from __future__ import annotations
@@ -22,6 +25,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 PACKAGE = REPO / "src" / "arina_grid_di"
+PYPROJECT = REPO / "pyproject.toml"
 
 # Zip-owned paths, replaced wholesale (minus OURS_INSIDE_GENERATED).
 GENERATED = [
@@ -147,10 +151,58 @@ def restore_version() -> str:
     return version
 
 
+# Generated env var name -> ours. A key that is absent is treated as already renamed, so this
+# step retires itself if the generator adopts the names.
+ENV_RENAMES = {
+    "API_KEY": "ARINA_GRID_API_KEY",
+    "ARINA_BASE_URL": "ARINA_GRID_BASE_URL",
+    "ARINA_LOG": "ARINA_GRID_LOG",
+    "ARINA_CUSTOM_HEADERS": "ARINA_GRID_CUSTOM_HEADERS",
+}
+RENAME_FILES = ["src/arina_grid_di/**/*.py", "api.md", "SKILL.md", ".claude/**/*.md", "tests/smoke-test.py"]
+PROJECT_NAME_RE = re.compile(r'^name\s*=\s*"([^"]+)"', re.MULTILINE)
+
 PLACEHOLDER_BASE_URL = re.compile(
     r'(if base_url is None:\n(?P<indent>\s+)base_url = os\.environ\.get\("(?P<env>[A-Z0-9_]+)"\)\n'
     r'\s+if base_url is None:\n\s+)base_url = "https://example\.com"'
 )
+
+
+def _generated_text_files():
+    for pattern in RENAME_FILES:
+        for path in REPO.glob(pattern):
+            if path.is_file() and "lib" not in path.relative_to(REPO).parts:
+                yield path
+
+
+def rename_package(source: Path) -> str:
+    """Make shipped docs name our distribution, whatever name the generator was configured with."""
+    theirs = PROJECT_NAME_RE.search((source / "pyproject.toml").read_text(encoding="utf-8"))
+    ours = PROJECT_NAME_RE.search(PYPROJECT.read_text(encoding="utf-8"))
+    if not theirs or not ours or theirs.group(1) == ours.group(1):
+        return f"generated docs already name {ours.group(1) if ours else '?'}"
+    count = 0
+    for path in _generated_text_files():
+        text = path.read_text(encoding="utf-8")
+        if theirs.group(1) in text:
+            count += text.count(theirs.group(1))
+            path.write_text(text.replace(theirs.group(1), ours.group(1)), encoding="utf-8")
+    return f"generated docs renamed {theirs.group(1)} -> {ours.group(1)} ({count} mentions)"
+
+
+def rename_env_vars() -> str:
+    """Rewrite generated environment variable names to the ARINA_GRID_* family."""
+    counts = dict.fromkeys(ENV_RENAMES, 0)
+    for path in _generated_text_files():
+        text = original = path.read_text(encoding="utf-8")
+        for old, new in ENV_RENAMES.items():
+            text, n = re.subn(rf"(?<![A-Za-z0-9_]){old}(?![A-Za-z0-9_])", new, text)
+            counts[old] += n
+        if text != original:
+            path.write_text(text, encoding="utf-8")
+    if not counts["API_KEY"] and not counts["ARINA_BASE_URL"]:
+        return "generated code already uses ARINA_GRID_* names; nothing renamed"
+    return "env vars renamed: " + ", ".join(f"{k}->{v} ({counts[k]})" for k, v in ENV_RENAMES.items())
 
 
 def patch_placeholder_base_url() -> str:
@@ -196,8 +248,10 @@ def main(argv: list[str]) -> int:
         source = extract(zip_path, Path(tmp))
         replaced = replace_generated(source)
         created, differing = handle_preserved(source)
+        package = rename_package(source)
 
     version = restore_version()
+    renamed = rename_env_vars()
     patched = patch_placeholder_base_url()
 
     print("\nimport complete")
@@ -207,6 +261,8 @@ def main(argv: list[str]) -> int:
     if differing:
         print(f"  review (preserved, zip differs): {', '.join(differing)}")
     print(f"  version restored to {version} in _version.py")
+    print(f"  package:  {package}")
+    print(f"  env vars: {renamed}")
     print(f"  base url: {patched}")
     print("\nnext: pytest, then commit as feat:/fix: describing the API change.")
     return 0

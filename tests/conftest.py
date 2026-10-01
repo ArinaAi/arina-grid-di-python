@@ -95,7 +95,7 @@ def make_client():
     def factory(responder: Responder) -> tuple[ArinaDocumentIntelligenceAPI, Recorder]:
         rec = Recorder(responder)
         client = ArinaDocumentIntelligenceAPI(
-            api_key_auth=API_KEY,
+            api_key=API_KEY,
             base_url=BASE_URL,
             http_client=httpx.Client(transport=httpx.MockTransport(rec)),
             max_retries=0,
@@ -112,7 +112,7 @@ def make_async_client():
     def factory(responder: Responder) -> tuple[AsyncArinaDocumentIntelligenceAPI, Recorder]:
         rec = Recorder(responder)
         client = AsyncArinaDocumentIntelligenceAPI(
-            api_key_auth=API_KEY,
+            api_key=API_KEY,
             base_url=BASE_URL,
             http_client=httpx.AsyncClient(transport=httpx.MockTransport(rec)),
             max_retries=0,

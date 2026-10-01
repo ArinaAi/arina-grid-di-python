@@ -56,12 +56,12 @@ __all__ = [
 
 class ArinaDocumentIntelligenceAPI(SyncAPIClient):
     # client options
-    api_key_auth: str
+    api_key: str
 
     def __init__(
         self,
         *,
-        api_key_auth: str | None = None,
+        api_key: str | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
@@ -84,22 +84,22 @@ class ArinaDocumentIntelligenceAPI(SyncAPIClient):
         """Construct a new synchronous ArinaDocumentIntelligenceAPI client instance.
 
         This automatically infers the following arguments from their corresponding environment variables if they are not provided:
-        - `api_key_auth` from `API_KEY_AUTH`
+        - `api_key` from `ARINA_GRID_API_KEY`
         """
-        if api_key_auth is None:
-            api_key_auth = os.environ.get("API_KEY_AUTH")
-        if api_key_auth is None:
+        if api_key is None:
+            api_key = os.environ.get("ARINA_GRID_API_KEY")
+        if api_key is None:
             raise ArinaDocumentIntelligenceAPIError(
-                "The api_key_auth client option must be set either by passing api_key_auth to the client or by setting the API_KEY_AUTH environment variable"
+                "The api_key client option must be set either by passing api_key to the client or by setting the ARINA_GRID_API_KEY environment variable"
             )
-        self.api_key_auth = api_key_auth
+        self.api_key = api_key
         if base_url is None:
-            base_url = os.environ.get("ARINA_BASE_URL")
+            base_url = os.environ.get("ARINA_GRID_BASE_URL")
         if base_url is None:
             raise ArinaDocumentIntelligenceAPIError(
-                "The base_url client option must be set either by passing base_url to the client or by setting the ARINA_BASE_URL environment variable"
+                "The base_url client option must be set either by passing base_url to the client or by setting the ARINA_GRID_BASE_URL environment variable"
             )
-        custom_headers_env = os.environ.get("ARINA_CUSTOM_HEADERS")
+        custom_headers_env = os.environ.get("ARINA_GRID_CUSTOM_HEADERS")
         if custom_headers_env is not None:
             parsed: dict[str, str] = {}
             for line in custom_headers_env.split("\n"):
@@ -155,7 +155,7 @@ class ArinaDocumentIntelligenceAPI(SyncAPIClient):
     @override
     def auth_headers(self) -> dict[str, str]:
         return {
-            **self._api_key_auth_header_auth,
+            **self._api_key_header_auth,
         }
 
     @override
@@ -169,8 +169,8 @@ class ArinaDocumentIntelligenceAPI(SyncAPIClient):
         return {}
 
     @property
-    def _api_key_auth_header_auth(self) -> dict[str, str]:
-        value = self.api_key_auth
+    def _api_key_header_auth(self) -> dict[str, str]:
+        value = self.api_key
         if value is None:
             return {}
         return {"X-API-Key": value}
@@ -197,13 +197,13 @@ class ArinaDocumentIntelligenceAPI(SyncAPIClient):
         if isinstance(custom_headers.get("X-API-Key"), Omit):
             return
         raise TypeError(
-            '"Could not resolve authentication method. Expected the api_key_auth to be set. Or for the `X-API-Key` headers to be explicitly omitted"'
+            '"Could not resolve authentication method. Expected the api_key to be set. Or for the `X-API-Key` headers to be explicitly omitted"'
         )
 
     def copy(
         self,
         *,
-        api_key_auth: str | None = None,
+        api_key: str | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.Client | None = None,
@@ -231,7 +231,7 @@ class ArinaDocumentIntelligenceAPI(SyncAPIClient):
             params = set_default_query
         http_client = http_client or self._client
         return self.__class__(
-            api_key_auth=api_key_auth or self.api_key_auth,
+            api_key=api_key or self.api_key,
             base_url=base_url or self.base_url,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,
@@ -267,12 +267,12 @@ class ArinaDocumentIntelligenceAPI(SyncAPIClient):
 
 class AsyncArinaDocumentIntelligenceAPI(AsyncAPIClient):
     # client options
-    api_key_auth: str
+    api_key: str
 
     def __init__(
         self,
         *,
-        api_key_auth: str | None = None,
+        api_key: str | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         max_retries: int = DEFAULT_MAX_RETRIES,
@@ -295,22 +295,22 @@ class AsyncArinaDocumentIntelligenceAPI(AsyncAPIClient):
         """Construct a new async AsyncArinaDocumentIntelligenceAPI client instance.
 
         This automatically infers the following arguments from their corresponding environment variables if they are not provided:
-        - `api_key_auth` from `API_KEY_AUTH`
+        - `api_key` from `ARINA_GRID_API_KEY`
         """
-        if api_key_auth is None:
-            api_key_auth = os.environ.get("API_KEY_AUTH")
-        if api_key_auth is None:
+        if api_key is None:
+            api_key = os.environ.get("ARINA_GRID_API_KEY")
+        if api_key is None:
             raise ArinaDocumentIntelligenceAPIError(
-                "The api_key_auth client option must be set either by passing api_key_auth to the client or by setting the API_KEY_AUTH environment variable"
+                "The api_key client option must be set either by passing api_key to the client or by setting the ARINA_GRID_API_KEY environment variable"
             )
-        self.api_key_auth = api_key_auth
+        self.api_key = api_key
         if base_url is None:
-            base_url = os.environ.get("ARINA_BASE_URL")
+            base_url = os.environ.get("ARINA_GRID_BASE_URL")
         if base_url is None:
             raise ArinaDocumentIntelligenceAPIError(
-                "The base_url client option must be set either by passing base_url to the client or by setting the ARINA_BASE_URL environment variable"
+                "The base_url client option must be set either by passing base_url to the client or by setting the ARINA_GRID_BASE_URL environment variable"
             )
-        custom_headers_env = os.environ.get("ARINA_CUSTOM_HEADERS")
+        custom_headers_env = os.environ.get("ARINA_GRID_CUSTOM_HEADERS")
         if custom_headers_env is not None:
             parsed: dict[str, str] = {}
             for line in custom_headers_env.split("\n"):
@@ -366,7 +366,7 @@ class AsyncArinaDocumentIntelligenceAPI(AsyncAPIClient):
     @override
     def auth_headers(self) -> dict[str, str]:
         return {
-            **self._api_key_auth_header_auth,
+            **self._api_key_header_auth,
         }
 
     @override
@@ -380,8 +380,8 @@ class AsyncArinaDocumentIntelligenceAPI(AsyncAPIClient):
         return {}
 
     @property
-    def _api_key_auth_header_auth(self) -> dict[str, str]:
-        value = self.api_key_auth
+    def _api_key_header_auth(self) -> dict[str, str]:
+        value = self.api_key
         if value is None:
             return {}
         return {"X-API-Key": value}
@@ -408,13 +408,13 @@ class AsyncArinaDocumentIntelligenceAPI(AsyncAPIClient):
         if isinstance(custom_headers.get("X-API-Key"), Omit):
             return
         raise TypeError(
-            '"Could not resolve authentication method. Expected the api_key_auth to be set. Or for the `X-API-Key` headers to be explicitly omitted"'
+            '"Could not resolve authentication method. Expected the api_key to be set. Or for the `X-API-Key` headers to be explicitly omitted"'
         )
 
     def copy(
         self,
         *,
-        api_key_auth: str | None = None,
+        api_key: str | None = None,
         base_url: str | httpx.URL | None = None,
         timeout: float | Timeout | None | NotGiven = not_given,
         http_client: httpx.AsyncClient | None = None,
@@ -442,7 +442,7 @@ class AsyncArinaDocumentIntelligenceAPI(AsyncAPIClient):
             params = set_default_query
         http_client = http_client or self._client
         return self.__class__(
-            api_key_auth=api_key_auth or self.api_key_auth,
+            api_key=api_key or self.api_key,
             base_url=base_url or self.base_url,
             timeout=self.timeout if isinstance(timeout, NotGiven) else timeout,
             http_client=http_client,

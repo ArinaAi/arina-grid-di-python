@@ -30,7 +30,7 @@ import os
 from arina_grid_di import ArinaDocumentIntelligenceAPI
 
 client = ArinaDocumentIntelligenceAPI(
-    api_key_auth=os.environ.get("API_KEY_AUTH"),
+    api_key=os.environ.get("ARINA_GRID_API_KEY"),
 )
 ```
 
