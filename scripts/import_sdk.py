@@ -4,8 +4,9 @@
     python scripts/import_sdk.py path/to/<sdk>.zip
 
 Generated paths are replaced; ours are untouched; preserved files (pyproject.toml,
-README.md, LICENSE, SECURITY.md) are created once, then only diffed. The version in
-pyproject.toml is written back into the generated _version.py; environment variable names
+README.md, LICENSE, SECURITY.md) are created once, then only diffed. The generated import
+package is renamed to arina_grid_di when the generator was configured with another project
+name; the version in pyproject.toml is written back into the generated _version.py; environment variable names
 are rewritten to the ARINA_GRID_* family and the distribution name in shipped docs to the
 one in pyproject.toml (the generator derives both from the API title and offers no setting);
 and the placeholder default base URL the generator emits when no environment is configured
@@ -61,17 +62,44 @@ def fail(message: str) -> None:
     raise SystemExit(1)
 
 
-def extract(zip_path: Path, into: Path) -> Path:
-    """Unzip and return the directory that holds pyproject.toml."""
+def extract(zip_path: Path, into: Path) -> tuple[Path, str]:
+    """Unzip; return the directory that holds pyproject.toml and the generated package's name."""
     with zipfile.ZipFile(zip_path) as archive:
         archive.extractall(into)
     candidates = [p.parent for p in into.rglob("pyproject.toml")]
     if len(candidates) != 1:
         fail(f"expected exactly one pyproject.toml in the zip, found {len(candidates)}")
     root = candidates[0]
-    if not (root / "src" / "arina_grid_di" / "_client.py").exists():
-        fail("zip does not contain src/arina_grid_di/_client.py")
-    return root
+    clients = list(root.glob("src/*/_client.py"))
+    if len(clients) != 1:
+        fail(f"expected exactly one src/<package>/_client.py in the zip, found {len(clients)}")
+    return root, clients[0].parent.name
+
+
+def rename_import_package(source: Path, theirs: str) -> str:
+    """Give the extracted zip our import name before anything is copied into the repo.
+
+    The generator derives the package directory from the project name it was configured with
+    and offers no separate setting; a zip from a project without that name arrives as
+    ``arina_document_intelligence``. Renaming the extracted copy keeps the generated/ours split
+    intact, and a zip that already uses our name makes this a no-op.
+    """
+    ours = PACKAGE.name
+    if theirs == ours:
+        return f"generated package already named {ours}"
+    (source / "src" / theirs).rename(source / "src" / ours)
+    pattern = re.compile(rf"(?<![A-Za-z0-9_]){re.escape(theirs)}(?![A-Za-z0-9_])")
+    count = 0
+    for path in (p for p in source.rglob("*") if p.is_file()):
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        text, n = pattern.subn(ours, text)
+        if n:
+            path.write_text(text, encoding="utf-8")
+            count += n
+    return f"generated package renamed {theirs} -> {ours} ({count} mentions)"
 
 
 def replace_generated(source: Path) -> list[str]:
@@ -245,7 +273,8 @@ def main(argv: list[str]) -> int:
         fail(f"no such file: {zip_path}")
 
     with tempfile.TemporaryDirectory() as tmp:
-        source = extract(zip_path, Path(tmp))
+        source, their_package = extract(zip_path, Path(tmp))
+        import_name = rename_import_package(source, their_package)
         replaced = replace_generated(source)
         created, differing = handle_preserved(source)
         package = rename_package(source)
@@ -262,6 +291,7 @@ def main(argv: list[str]) -> int:
         print(f"  review (preserved, zip differs): {', '.join(differing)}")
     print(f"  version restored to {version} in _version.py")
     print(f"  package:  {package}")
+    print(f"  import:   {import_name}")
     print(f"  env vars: {renamed}")
     print(f"  base url: {patched}")
     print("\nnext: pytest, then commit as feat:/fix: describing the API change.")
