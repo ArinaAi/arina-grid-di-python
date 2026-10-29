@@ -74,7 +74,7 @@ class ParseResource(SyncAPIResource):
             ```python
             parse = client.parse.create_run(
                 file=b"file",
-                config='{"organizationId": "org_123", "config": {"includeTextLines": false}}',
+                config='{"config": {"includeTextLines": false}}',
             )
             ```
         """
@@ -229,7 +229,7 @@ class AsyncParseResource(AsyncAPIResource):
             ```python
             parse = await client.parse.create_run(
                 file=b"file",
-                config='{"organizationId": "org_123", "config": {"includeTextLines": false}}',
+                config='{"config": {"includeTextLines": false}}',
             )
             ```
         """

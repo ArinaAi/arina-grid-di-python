@@ -28,3 +28,6 @@ class ExtractConfigParam(TypedDict, total=False):
 
     citation_mode: Annotated[str, PropertyInfo(alias="citationMode")]
     """Granularity of citation geometry. Only 'block' is served today; 'cell', 'line' and 'word' are declared but rejected until the upstream geometry they need is enabled."""
+
+    tier: str
+    """Processing tier. 'standard' is the default; 'premium' uses a larger model for higher field accuracy at higher latency and cost. On a run from a saved extractor, an explicit value overrides the extractor's."""

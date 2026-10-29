@@ -33,9 +33,10 @@ from ._streaming import Stream as Stream, AsyncStream as AsyncStream
 from ._version import __version__
 
 if TYPE_CHECKING:
-    from .resources import extraction, parse, extractors
+    from .resources import extraction, parse, account, extractors
     from .resources.extraction import ExtractionResource, AsyncExtractionResource
     from .resources.parse import ParseResource, AsyncParseResource
+    from .resources.account import AccountResource, AsyncAccountResource
     from .resources.extractors import ExtractorsResource, AsyncExtractorsResource
 
 # Serializes lazy resource imports so concurrent cold access from multiple
@@ -131,6 +132,12 @@ class ArinaDocumentIntelligenceAPI(SyncAPIClient):
         with _RESOURCE_IMPORT_LOCK:
             from .resources.parse import ParseResource
         return ParseResource(self)
+
+    @cached_property
+    def account(self) -> "AccountResource":
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.account import AccountResource
+        return AccountResource(self)
 
     @cached_property
     def extractors(self) -> "ExtractorsResource":
@@ -344,6 +351,12 @@ class AsyncArinaDocumentIntelligenceAPI(AsyncAPIClient):
         return AsyncParseResource(self)
 
     @cached_property
+    def account(self) -> "AsyncAccountResource":
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.account import AsyncAccountResource
+        return AsyncAccountResource(self)
+
+    @cached_property
     def extractors(self) -> "AsyncExtractorsResource":
         with _RESOURCE_IMPORT_LOCK:
             from .resources.extractors import AsyncExtractorsResource
@@ -495,6 +508,12 @@ class ArinaDocumentIntelligenceAPIWithRawResponse:
         return ParseResourceWithRawResponse(self._client.parse)
 
     @cached_property
+    def account(self) -> account.AccountResourceWithRawResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.account import AccountResourceWithRawResponse
+        return AccountResourceWithRawResponse(self._client.account)
+
+    @cached_property
     def extractors(self) -> extractors.ExtractorsResourceWithRawResponse:
         with _RESOURCE_IMPORT_LOCK:
             from .resources.extractors import ExtractorsResourceWithRawResponse
@@ -518,6 +537,12 @@ class AsyncArinaDocumentIntelligenceAPIWithRawResponse:
         with _RESOURCE_IMPORT_LOCK:
             from .resources.parse import AsyncParseResourceWithRawResponse
         return AsyncParseResourceWithRawResponse(self._client.parse)
+
+    @cached_property
+    def account(self) -> account.AsyncAccountResourceWithRawResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.account import AsyncAccountResourceWithRawResponse
+        return AsyncAccountResourceWithRawResponse(self._client.account)
 
     @cached_property
     def extractors(self) -> extractors.AsyncExtractorsResourceWithRawResponse:
@@ -545,6 +570,12 @@ class ArinaDocumentIntelligenceAPIWithStreamedResponse:
         return ParseResourceWithStreamingResponse(self._client.parse)
 
     @cached_property
+    def account(self) -> account.AccountResourceWithStreamingResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.account import AccountResourceWithStreamingResponse
+        return AccountResourceWithStreamingResponse(self._client.account)
+
+    @cached_property
     def extractors(self) -> extractors.ExtractorsResourceWithStreamingResponse:
         with _RESOURCE_IMPORT_LOCK:
             from .resources.extractors import ExtractorsResourceWithStreamingResponse
@@ -568,6 +599,12 @@ class AsyncArinaDocumentIntelligenceAPIWithStreamedResponse:
         with _RESOURCE_IMPORT_LOCK:
             from .resources.parse import AsyncParseResourceWithStreamingResponse
         return AsyncParseResourceWithStreamingResponse(self._client.parse)
+
+    @cached_property
+    def account(self) -> account.AsyncAccountResourceWithStreamingResponse:
+        with _RESOURCE_IMPORT_LOCK:
+            from .resources.account import AsyncAccountResourceWithStreamingResponse
+        return AsyncAccountResourceWithStreamingResponse(self._client.account)
 
     @cached_property
     def extractors(self) -> extractors.AsyncExtractorsResourceWithStreamingResponse:

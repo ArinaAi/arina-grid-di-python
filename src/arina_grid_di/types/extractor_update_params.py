@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import Dict, Optional
-from typing_extensions import Annotated, Required, TypedDict
+from typing_extensions import Annotated, TypedDict
 
 from .._utils import PropertyInfo
 
@@ -13,8 +13,6 @@ __all__ = ["ExtractorUpdateParams"]
 
 
 class ExtractorUpdateParams(TypedDict, total=False):
-    organization_id: Required[Annotated[str, PropertyInfo(alias="organizationId")]]
-
     name: Optional[str]
 
     description: Optional[str]

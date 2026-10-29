@@ -30,7 +30,9 @@ Generated and hand-written code never share a file, so regeneration is a plain c
 4. Commit with the prefix that matches the API change (below), open a PR, merge when CI is green.
 
 The import restores the current version into `_version.py` (the zip always says `0.1.0`), rejects zips that
-are not this SDK, rewrites the distribution name in shipped docs to the one in `pyproject.toml` and the
+are not this SDK, renames the generated import package to `arina_grid_di` when the generator project was
+configured with another name (the zip then arrives as `arina_document_intelligence`), rewrites the
+distribution name in shipped docs to the one in `pyproject.toml` and the
 environment variables the generator derives from the API title and the security scheme (`API_KEY`,
 `ARINA_BASE_URL`, `ARINA_LOG`, `ARINA_CUSTOM_HEADERS`) to the `ARINA_GRID_*` family, and replaces the
 generator's placeholder default host (`https://example.com`, emitted when
