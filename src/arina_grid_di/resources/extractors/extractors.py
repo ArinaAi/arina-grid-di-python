@@ -28,13 +28,7 @@ from .versions import (
 )
 from ...types.extractor import Extractor
 from ...types.extract_config_param import ExtractConfigParam
-from ...types import (
-    extractor_create_params,
-    extractor_list_params,
-    extractor_retrieve_params,
-    extractor_update_params,
-    extractor_delete_params,
-)
+from ...types import extractor_create_params, extractor_list_params, extractor_update_params, extractor_delete_params
 from ...types.extractor_list import ExtractorList
 from ...types.extractor_delete_response import ExtractorDeleteResponse
 
@@ -57,7 +51,6 @@ class ExtractorsResource(SyncAPIResource):
     def create(
         self,
         *,
-        organization_id: str,
         name: str,
         description: Optional[str] | Omit = omit,
         config: ExtractConfigParam,
@@ -74,7 +67,6 @@ class ExtractorsResource(SyncAPIResource):
         Save a named, versioned extraction configuration. The schema is validated here, so a mistake is a 422 at save time.
 
         Args:
-            organization_id: Body parameter.
             name: Body parameter.
             description: Body parameter.
             config: Extraction parameters for one run.
@@ -91,7 +83,6 @@ class ExtractorsResource(SyncAPIResource):
         Example:
             ```python
             extractor = client.extractors.create(
-                organization_id="org_123",
                 name="Invoice — EU vendors",
                 description=None,
                 config={
@@ -107,7 +98,6 @@ class ExtractorsResource(SyncAPIResource):
             "/extractors",
             body=maybe_transform(
                 {
-                    "organization_id": organization_id,
                     "name": name,
                     "description": description,
                     "config": config,
@@ -124,7 +114,6 @@ class ExtractorsResource(SyncAPIResource):
     def list(
         self,
         *,
-        organization_id: str,
         status: Literal["ACTIVE", "ARCHIVED", "all"] | Omit = omit,
         x_api_version: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -138,7 +127,6 @@ class ExtractorsResource(SyncAPIResource):
         A tenant's extractors, `ACTIVE` by default. `status=ARCHIVED|all` to widen.
 
         Args:
-            organization_id: Tenant that owns the resource.
             status: Query parameter.
             x_api_version: Contract version. Currently only `2026-09-05`. Omit to get the current version. An unsupported value is rejected with 400.
             extra_headers: Send extra headers with the request.
@@ -151,9 +139,7 @@ class ExtractorsResource(SyncAPIResource):
 
         Example:
             ```python
-            extractor = client.extractors.list(
-                organization_id="organization_id",
-            )
+            extractors = client.extractors.list()
             ```
         """
         extra_headers = {**strip_not_given({"X-Api-Version": x_api_version}), **(extra_headers or {})}
@@ -164,9 +150,7 @@ class ExtractorsResource(SyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                query=maybe_transform(
-                    {"organization_id": organization_id, "status": status}, extractor_list_params.ExtractorListParams
-                ),
+                query=maybe_transform({"status": status}, extractor_list_params.ExtractorListParams),
             ),
             cast_to=ExtractorList,
         )
@@ -175,7 +159,6 @@ class ExtractorsResource(SyncAPIResource):
         self,
         extractor_id: str,
         *,
-        organization_id: str,
         x_api_version: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -189,7 +172,6 @@ class ExtractorsResource(SyncAPIResource):
 
         Args:
             extractor_id: Path parameter.
-            organization_id: Tenant that owns the resource.
             x_api_version: Contract version. Currently only `2026-09-05`. Omit to get the current version. An unsupported value is rejected with 400.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
@@ -203,7 +185,6 @@ class ExtractorsResource(SyncAPIResource):
             ```python
             extractor = client.extractors.retrieve(
                 extractor_id="extractorId",
-                organization_id="organization_id",
             )
             ```
         """
@@ -213,13 +194,7 @@ class ExtractorsResource(SyncAPIResource):
         return self._get(
             path_template("/extractors/{extractor_id}", **{"extractor_id": extractor_id}),
             options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                query=maybe_transform(
-                    {"organization_id": organization_id}, extractor_retrieve_params.ExtractorRetrieveParams
-                ),
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
             cast_to=Extractor,
         )
@@ -228,7 +203,6 @@ class ExtractorsResource(SyncAPIResource):
         self,
         extractor_id: str,
         *,
-        organization_id: str,
         name: Optional[str] | Omit = omit,
         description: Optional[str] | Omit = omit,
         config: Optional[ExtractConfigParam] | Omit = omit,
@@ -247,7 +221,6 @@ class ExtractorsResource(SyncAPIResource):
 
         Args:
             extractor_id: Path parameter.
-            organization_id: Body parameter.
             name: Body parameter.
             description: Body parameter.
             config: Extraction parameters for one run.
@@ -266,7 +239,6 @@ class ExtractorsResource(SyncAPIResource):
             ```python
             extractor = client.extractors.update(
                 extractor_id="extractorId",
-                organization_id="x",
                 name=None,
                 description=None,
                 config=None,
@@ -282,7 +254,6 @@ class ExtractorsResource(SyncAPIResource):
             path_template("/extractors/{extractor_id}", **{"extractor_id": extractor_id}),
             body=maybe_transform(
                 {
-                    "organization_id": organization_id,
                     "name": name,
                     "description": description,
                     "config": config,
@@ -301,7 +272,6 @@ class ExtractorsResource(SyncAPIResource):
         self,
         extractor_id: str,
         *,
-        organization_id: str,
         permanent: bool | Omit = omit,
         x_api_version: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -316,7 +286,6 @@ class ExtractorsResource(SyncAPIResource):
 
         Args:
             extractor_id: Path parameter.
-            organization_id: Tenant that owns the resource.
             permanent: Query parameter.
             x_api_version: Contract version. Currently only `2026-09-05`. Omit to get the current version. An unsupported value is rejected with 400.
             extra_headers: Send extra headers with the request.
@@ -331,7 +300,6 @@ class ExtractorsResource(SyncAPIResource):
             ```python
             extractor = client.extractors.delete(
                 extractor_id="extractorId",
-                organization_id="organization_id",
                 permanent=False,
             )
             ```
@@ -346,10 +314,7 @@ class ExtractorsResource(SyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                query=maybe_transform(
-                    {"organization_id": organization_id, "permanent": permanent},
-                    extractor_delete_params.ExtractorDeleteParams,
-                ),
+                query=maybe_transform({"permanent": permanent}, extractor_delete_params.ExtractorDeleteParams),
             ),
             cast_to=ExtractorDeleteResponse,
         )
@@ -371,7 +336,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        organization_id: str,
         name: str,
         description: Optional[str] | Omit = omit,
         config: ExtractConfigParam,
@@ -388,7 +352,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
         Save a named, versioned extraction configuration. The schema is validated here, so a mistake is a 422 at save time.
 
         Args:
-            organization_id: Body parameter.
             name: Body parameter.
             description: Body parameter.
             config: Extraction parameters for one run.
@@ -405,7 +368,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
         Example:
             ```python
             extractor = await client.extractors.create(
-                organization_id="org_123",
                 name="Invoice — EU vendors",
                 description=None,
                 config={
@@ -421,7 +383,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
             "/extractors",
             body=await async_maybe_transform(
                 {
-                    "organization_id": organization_id,
                     "name": name,
                     "description": description,
                     "config": config,
@@ -438,7 +399,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
     async def list(
         self,
         *,
-        organization_id: str,
         status: Literal["ACTIVE", "ARCHIVED", "all"] | Omit = omit,
         x_api_version: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -452,7 +412,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
         A tenant's extractors, `ACTIVE` by default. `status=ARCHIVED|all` to widen.
 
         Args:
-            organization_id: Tenant that owns the resource.
             status: Query parameter.
             x_api_version: Contract version. Currently only `2026-09-05`. Omit to get the current version. An unsupported value is rejected with 400.
             extra_headers: Send extra headers with the request.
@@ -465,9 +424,7 @@ class AsyncExtractorsResource(AsyncAPIResource):
 
         Example:
             ```python
-            extractor = await client.extractors.list(
-                organization_id="organization_id",
-            )
+            extractors = await client.extractors.list()
             ```
         """
         extra_headers = {**strip_not_given({"X-Api-Version": x_api_version}), **(extra_headers or {})}
@@ -478,9 +435,7 @@ class AsyncExtractorsResource(AsyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                query=await async_maybe_transform(
-                    {"organization_id": organization_id, "status": status}, extractor_list_params.ExtractorListParams
-                ),
+                query=await async_maybe_transform({"status": status}, extractor_list_params.ExtractorListParams),
             ),
             cast_to=ExtractorList,
         )
@@ -489,7 +444,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
         self,
         extractor_id: str,
         *,
-        organization_id: str,
         x_api_version: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -503,7 +457,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
 
         Args:
             extractor_id: Path parameter.
-            organization_id: Tenant that owns the resource.
             x_api_version: Contract version. Currently only `2026-09-05`. Omit to get the current version. An unsupported value is rejected with 400.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
@@ -517,7 +470,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
             ```python
             extractor = await client.extractors.retrieve(
                 extractor_id="extractorId",
-                organization_id="organization_id",
             )
             ```
         """
@@ -527,13 +479,7 @@ class AsyncExtractorsResource(AsyncAPIResource):
         return await self._get(
             path_template("/extractors/{extractor_id}", **{"extractor_id": extractor_id}),
             options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                query=await async_maybe_transform(
-                    {"organization_id": organization_id}, extractor_retrieve_params.ExtractorRetrieveParams
-                ),
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
             cast_to=Extractor,
         )
@@ -542,7 +488,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
         self,
         extractor_id: str,
         *,
-        organization_id: str,
         name: Optional[str] | Omit = omit,
         description: Optional[str] | Omit = omit,
         config: Optional[ExtractConfigParam] | Omit = omit,
@@ -561,7 +506,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
 
         Args:
             extractor_id: Path parameter.
-            organization_id: Body parameter.
             name: Body parameter.
             description: Body parameter.
             config: Extraction parameters for one run.
@@ -580,7 +524,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
             ```python
             extractor = await client.extractors.update(
                 extractor_id="extractorId",
-                organization_id="x",
                 name=None,
                 description=None,
                 config=None,
@@ -596,7 +539,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
             path_template("/extractors/{extractor_id}", **{"extractor_id": extractor_id}),
             body=await async_maybe_transform(
                 {
-                    "organization_id": organization_id,
                     "name": name,
                     "description": description,
                     "config": config,
@@ -615,7 +557,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
         self,
         extractor_id: str,
         *,
-        organization_id: str,
         permanent: bool | Omit = omit,
         x_api_version: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -630,7 +571,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
 
         Args:
             extractor_id: Path parameter.
-            organization_id: Tenant that owns the resource.
             permanent: Query parameter.
             x_api_version: Contract version. Currently only `2026-09-05`. Omit to get the current version. An unsupported value is rejected with 400.
             extra_headers: Send extra headers with the request.
@@ -645,7 +585,6 @@ class AsyncExtractorsResource(AsyncAPIResource):
             ```python
             extractor = await client.extractors.delete(
                 extractor_id="extractorId",
-                organization_id="organization_id",
                 permanent=False,
             )
             ```
@@ -661,8 +600,7 @@ class AsyncExtractorsResource(AsyncAPIResource):
                 extra_body=extra_body,
                 timeout=timeout,
                 query=await async_maybe_transform(
-                    {"organization_id": organization_id, "permanent": permanent},
-                    extractor_delete_params.ExtractorDeleteParams,
+                    {"permanent": permanent}, extractor_delete_params.ExtractorDeleteParams
                 ),
             ),
             cast_to=ExtractorDeleteResponse,

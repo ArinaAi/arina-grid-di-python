@@ -12,6 +12,8 @@ Complete reference of every operation, grouped by resource. See [the README](./R
   - [Start a parse run](#start-a-parse-run)
   - [Get a parse run](#get-a-parse-run)
   - [Get the parse page image](#get-the-parse-page-image)
+- [`Account`](#account)
+  - [Who am I](#who-am-i)
 - [`Extractors`](#extractors)
   - [Create an extractor](#create-an-extractor)
   - [List extractors](#list-extractors)
@@ -52,7 +54,7 @@ Accept a document and return a run to poll. `config.config` is either an inline 
 ```python
 extraction = client.extraction.create_extract_run(
     file=b"file",
-    config='{"organizationId": "org_123", "config": {"jsonSchema": {"type": "object", "properties": {"invoiceNumber": {"type": ["string", "null"]}, "invoiceTotal": {"type": ["number", "null"], "description": "Total amount due"}}}, "citationsEnabled": true}}',
+    config='{"config": {"jsonSchema": {"type": "object", "properties": {"invoiceNumber": {"type": ["string", "null"]}, "invoiceTotal": {"type": ["number", "null"], "description": "Total amount due"}}}, "citationsEnabled": true}}',
 )
 ```
 
@@ -98,7 +100,7 @@ Read page 1 into layout blocks, tables (HTML) and markdown — no schema. `202`:
 ```python
 parse = client.parse.create_run(
     file=b"file",
-    config='{"organizationId": "org_123", "config": {"includeTextLines": false}}',
+    config='{"config": {"includeTextLines": false}}',
 )
 ```
 
@@ -126,6 +128,22 @@ parse = client.parse.list_run_page(
 )
 ```
 
+## `Account`
+
+Who you are. Send `X-API-Key`; the key alone decides which organisation's data is read or written and which route groups (`scopes`) are allowed. Keys are issued and managed in the portal, not through this API.
+
+### Who am I
+
+Resolve the presented API key to its organisation and scopes. Derived entirely from the key; the caller declares nothing.
+
+| Direction | Type |
+| --- | --- |
+| Response | [`Identity`](./src/arina_grid_di/types/identity.py) |
+
+```python
+account = client.account.who_am_i()
+```
+
 ## `Extractors`
 
 A saved, **versioned** extraction configuration for a tenant: the schema, rules and citation settings a run would otherwise carry inline. Save it once, then start runs with `config.extractorId`.
@@ -143,7 +161,6 @@ Save a named, versioned extraction configuration. The schema is validated here, 
 
 ```python
 extractor = client.extractors.create(
-    organization_id="org_123",
     name="Invoice — EU vendors",
     description=None,
     config={
@@ -164,9 +181,7 @@ A tenant's extractors, `ACTIVE` by default. `status=ARCHIVED|all` to widen.
 | Response | [`ExtractorList`](./src/arina_grid_di/types/extractor_list.py) |
 
 ```python
-extractor = client.extractors.list(
-    organization_id="organization_id",
-)
+extractors = client.extractors.list()
 ```
 
 ### Get an extractor
@@ -175,13 +190,11 @@ The current version of one extractor.
 
 | Direction | Type |
 | --- | --- |
-| Request | [`ExtractorRetrieveParams`](./src/arina_grid_di/types/extractor_retrieve_params.py) |
 | Response | [`Extractor`](./src/arina_grid_di/types/extractor.py) |
 
 ```python
 extractor = client.extractors.retrieve(
     extractor_id="extractorId",
-    organization_id="organization_id",
 )
 ```
 
@@ -197,7 +210,6 @@ Rename, describe or reconfigure. Only a `config` change bumps the version. Send 
 ```python
 extractor = client.extractors.update(
     extractor_id="extractorId",
-    organization_id="x",
     name=None,
     description=None,
     config=None,
@@ -218,7 +230,6 @@ Archive by default (record and versions kept, new runs refused). `permanent=true
 ```python
 extractor = client.extractors.delete(
     extractor_id="extractorId",
-    organization_id="organization_id",
     permanent=False,
 )
 ```
@@ -235,13 +246,11 @@ Every immutable config snapshot, newest first.
 
 | Direction | Type |
 | --- | --- |
-| Request | [`VersionListParams`](./src/arina_grid_di/types/extractors/version_list_params.py) |
 | Response | [`ExtractorVersionList`](./src/arina_grid_di/types/extractors/extractor_version_list.py) |
 
 ```python
-version = client.extractors.versions.list(
+extractor_versions = client.extractors.versions.list(
     extractor_id="extractorId",
-    organization_id="organization_id",
 )
 ```
 
@@ -251,13 +260,11 @@ One config snapshot by number.
 
 | Direction | Type |
 | --- | --- |
-| Request | [`VersionRetrieveParams`](./src/arina_grid_di/types/extractors/version_retrieve_params.py) |
 | Response | [`ExtractorVersion`](./src/arina_grid_di/types/extractors/extractor_version.py) |
 
 ```python
 version = client.extractors.versions.retrieve(
     extractor_id="extractorId",
     version=1,
-    organization_id="organization_id",
 )
 ```

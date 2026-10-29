@@ -1,5 +1,5 @@
 ---
-name: arina-document-intelligence-api-python-sdk
+name: arina-grid-di-api-python-sdk
 description: "Python SDK for Arina Document Intelligence API. Use when writing Python code that calls Arina Document Intelligence API with the arina-grid-di package: installing it, constructing and authenticating the client, and calling API operations."
 ---
 
@@ -42,7 +42,7 @@ client = ArinaDocumentIntelligenceAPI(
 
 extraction = client.extraction.create_extract_run(
     file=b"file",
-    config='{"organizationId": "org_123", "config": {"jsonSchema": {"type": "object", "properties": {"invoiceNumber": {"type": ["string", "null"]}, "invoiceTotal": {"type": ["number", "null"], "description": "Total amount due"}}}, "citationsEnabled": true}}',
+    config='{"config": {"jsonSchema": {"type": "object", "properties": {"invoiceNumber": {"type": ["string", "null"]}, "invoiceTotal": {"type": ["number", "null"], "description": "Total amount due"}}}, "citationsEnabled": true}}',
 )
 
 print(extraction)
@@ -60,7 +60,7 @@ from arina_grid_di import APIStatusError
 try:
     extraction = client.extraction.create_extract_run(
         file=b"file",
-        config='{"organizationId": "org_123", "config": {"jsonSchema": {"type": "object", "properties": {"invoiceNumber": {"type": ["string", "null"]}, "invoiceTotal": {"type": ["number", "null"], "description": "Total amount due"}}}, "citationsEnabled": true}}',
+        config='{"config": {"jsonSchema": {"type": "object", "properties": {"invoiceNumber": {"type": ["string", "null"]}, "invoiceTotal": {"type": ["number", "null"], "description": "Total amount due"}}}, "citationsEnabled": true}}',
     )
 except APIStatusError as err:
     print(err.status_code, err.message)
@@ -69,7 +69,7 @@ except APIStatusError as err:
 
 ## Requirements
 
-- Python 3.8 or newer
+- Python 3.9 or newer
 
 ## Reference files
 

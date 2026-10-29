@@ -18,12 +18,14 @@ from .text_line import TextLine as TextLine
 from .parse_run import ParseRun as ParseRun
 from .extractor import Extractor as Extractor
 from .extractor_list import ExtractorList as ExtractorList
+from .identity_organization import IdentityOrganization as IdentityOrganization
+from .identity_user import IdentityUser as IdentityUser
+from .identity import Identity as Identity
 from .extract_config_param import ExtractConfigParam as ExtractConfigParam
 from .extraction_create_extract_run_params import ExtractionCreateExtractRunParams as ExtractionCreateExtractRunParams
 from .parse_create_run_params import ParseCreateRunParams as ParseCreateRunParams
 from .extractor_create_params import ExtractorCreateParams as ExtractorCreateParams
 from .extractor_list_params import ExtractorListParams as ExtractorListParams
-from .extractor_retrieve_params import ExtractorRetrieveParams as ExtractorRetrieveParams
 from .extractor_update_params import ExtractorUpdateParams as ExtractorUpdateParams
 from .extractor_delete_response import ExtractorDeleteResponse as ExtractorDeleteResponse
 from .extractor_delete_params import ExtractorDeleteParams as ExtractorDeleteParams

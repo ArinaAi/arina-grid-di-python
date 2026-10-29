@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing_extensions import Annotated, Required, TypedDict
+from typing_extensions import Annotated, TypedDict
 
 from .._utils import PropertyInfo
 
@@ -10,9 +10,6 @@ __all__ = ["ExtractorDeleteParams"]
 
 
 class ExtractorDeleteParams(TypedDict, total=False):
-    organization_id: Required[Annotated[str, PropertyInfo(alias="organizationId")]]
-    """Tenant that owns the resource."""
-
     permanent: bool
 
     x_api_version: Annotated[str, PropertyInfo(alias="X-Api-Version")]

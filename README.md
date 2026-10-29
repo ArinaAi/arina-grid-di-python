@@ -9,11 +9,11 @@ The full API of this library can be found in [api.md](./api.md).
 ## Contents
 
 - [Installation](#installation)
+- [Authentication](#authentication)
 - [Usage](#usage)
 - [Waiting for a run](#waiting-for-a-run)
 - [API Reference](./api.md)
 - [Async](#async)
-- [Authentication](#authentication)
 - [Errors](#errors)
 - [Client Options](#client-options)
 - [Retries and Timeouts](#retries-and-timeouts)
@@ -31,11 +31,54 @@ pip install arina-grid-di
 
 <br />
 
+## Authentication
+
+Every request carries one credential: an API key, sent as the `X-API-Key` header. **The key
+is the tenant.** It names your organisation and what it may do, so no request names an
+organisation: there is no `organizationId` to pass anywhere.
+
+### Get your key
+
+Sign in to the GRID portal, open **API keys** and create one. The secret is shown once; keep
+it in a secret manager or the `ARINA_GRID_API_KEY` environment variable, never in source
+control. Keys look like `grid_<12 hex>_<64 hex>`.
+
+A key carries **scopes**, one per group of operations:
+
+| Scope | Allows |
+| --- | --- |
+| `extract` | `client.extraction.*` |
+| `parse` | `client.parse.*` |
+| `extractors:read` | `client.extractors.list` / `retrieve` and `client.extractors.versions.*` |
+| `extractors:write` | `client.extractors.create` / `update` / `delete` |
+
+`client.account.who_am_i()` needs no scope.
+
+### Check your key
+
+```python
+from arina_grid_di import ArinaDocumentIntelligenceAPI
+
+client = ArinaDocumentIntelligenceAPI(api_key="<your key>", base_url="https://<your base url>")
+
+me = client.account.who_am_i()
+print(me.organization.slug, me.key_id, me.scopes)
+```
+
+A missing, revoked or expired key raises `AuthenticationError` (401). A key without a scope
+the operation needs raises `PermissionDeniedError` (403) whose body names the missing scopes;
+see [Errors](#errors).
+
+The client reads `ARINA_GRID_API_KEY` and `ARINA_GRID_BASE_URL` when the options are not
+passed. This version targets deployments that enforce API keys: Arina's hosted service, and
+your organisation's own deployment once it has been switched over.
+
+<br />
+
 ## Usage
 
 You need the base URL of the service you are using (Arina-hosted, or your organisation's
-own deployment) and the API key that goes with it. Both are required: the client has no
-default host.
+own deployment) and an API key for it. Both are required: the client has no default host.
 
 ```python
 import json
@@ -52,7 +95,6 @@ client = ArinaDocumentIntelligenceAPI(
 run = client.extraction.create_extract_run(
     file=open("invoice.pdf", "rb"),
     config=json.dumps({
-        "organizationId": "org_123",
         "config": {
             "jsonSchema": {
                 "type": "object",
@@ -65,7 +107,7 @@ run = client.extraction.create_extract_run(
         },
     }),
 )
-print(run.id, run.status)  # exr_..., PROCESSING
+print(run.id, run.status)  # exr_..., PENDING or PROCESSING
 ```
 
 The examples in the following sections assume a `client` configured as shown above.
@@ -116,10 +158,10 @@ from arina_grid_di import AsyncArinaDocumentIntelligenceAPI
 
 
 async def main() -> None:
-    client = AsyncArinaDocumentIntelligenceAPI()
+    client = AsyncArinaDocumentIntelligenceAPI()  # ARINA_GRID_API_KEY and ARINA_GRID_BASE_URL from the environment
     extraction = await client.extraction.create_extract_run(
         file=b"file",
-        config='{"organizationId": "org_123", "config": {"jsonSchema": {"type": "object", "properties": {"invoiceNumber": {"type": ["string", "null"]}, "invoiceTotal": {"type": ["number", "null"], "description": "Total amount due"}}}, "citationsEnabled": true}}',
+        config='{"config": {"jsonSchema": {"type": "object", "properties": {"invoiceNumber": {"type": ["string", "null"]}, "invoiceTotal": {"type": ["number", "null"], "description": "Total amount due"}}}, "citationsEnabled": true}}',
     )
 
 
@@ -128,38 +170,35 @@ asyncio.run(main())
 
 <br />
 
-## Authentication
-
-Pass credentials to the generated client constructor. Environment variables are read automatically when supported by the target runtime.
-
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `api_key` | `string \| provider` | - | Credential for the ApiKey scheme. Defaults to `ARINA_GRID_API_KEY`. |
-
-Declared schemes:
-
-- `ApiKey` API key in header `X-API-Key`
-
-<br />
-
 ## Errors
 
-Non-success responses throw generated API errors. Error objects expose status, headers, response body, and request metadata where the target runtime supports it.
+Non-success responses raise generated API errors, all subclasses of `APIStatusError`. Each
+carries `status_code`, `message`, the parsed JSON `body` and the raw `response`.
 
 ```python
-from arina_grid_di import APIStatusError
+from arina_grid_di import APIStatusError, AuthenticationError, PermissionDeniedError
 
 try:
-    extraction = client.extraction.create_extract_run(
-        file=b"file",
-        config='{"organizationId": "org_123", "config": {"jsonSchema": {"type": "object", "properties": {"invoiceNumber": {"type": ["string", "null"]}, "invoiceTotal": {"type": ["number", "null"], "description": "Total amount due"}}}, "citationsEnabled": true}}',
-    )
+    extractor = client.extractors.create(name="Invoices", config={"jsonSchema": {"type": "object"}})
+except AuthenticationError:
+    # 401: the key is missing, unknown, revoked or expired. The body is a bare {"detail": "Unauthorized"}.
+    raise
+except PermissionDeniedError as err:
+    # 403: the key lacks a scope this operation needs.
+    detail = err.body["detail"]  # {"code": "missing_scope", "message": "...", "missing": ["extractors:write"]}
+    print(detail["code"], detail.get("missing"))
+    raise
 except APIStatusError as err:
     print(err.status_code, err.message)
     raise
 ```
 
-Documented error statuses: `400`, `404`, `409`, `422`, `503`.
+`body["detail"]` is a string for most refusals, a list of `{loc, msg}` objects for a
+request-validation failure (422), and an object `{code, message, ...}` where you are meant
+to branch on `code`. A resource that belongs to another organisation is a plain `404`.
+
+Documented error statuses: `400`, `401`, `403`, `404`, `409`, `422`, `503`. A `503` (key check
+or run storage unavailable) carries `Retry-After` and is retried automatically; see below.
 
 <br />
 
@@ -178,12 +217,15 @@ client = ArinaDocumentIntelligenceAPI(
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
-| `api_key` | `str \| None` | `os.environ.get("ARINA_GRID_API_KEY")` | Credential for the ApiKey scheme. |
-| `base_url` | `str \| httpx.URL \| None` | - | Override the default API base URL. |
+| `api_key` | `str \| None` | `os.environ.get("ARINA_GRID_API_KEY")` | Credential for the ApiKey scheme, sent as `X-API-Key`. |
+| `base_url` | `str \| httpx.URL \| None` | `os.environ.get("ARINA_GRID_BASE_URL")` | Where the service is. Required: there is no default host. |
 | `timeout` | `float \| Timeout \| None` | `60.0` | Maximum time in seconds to wait for a response before aborting a request. |
 | `max_retries` | `int` | `2` | Number of retries for temporary failures. |
 | `default_headers` | `Mapping[str, str] \| None` | - | Headers sent with every request. |
 | `default_query` | `Mapping[str, object] \| None` | - | Query parameters sent with every request. |
+
+`ARINA_GRID_CUSTOM_HEADERS` (newline-separated `Name: value` lines) adds headers to every
+request, like `default_headers`; an explicit `default_headers` wins on a clash.
 
 <br />
 
@@ -202,7 +244,7 @@ Generated clients support request timeouts and retry temporary failures such as 
 
 ## Logging
 
-- Set the `ARINA_LOG` environment variable to `info` or `debug` to enable HTTP logging.
+- Set the `ARINA_GRID_LOG` environment variable to `info` or `debug` to enable HTTP logging.
 - Logs are emitted through the standard `logging` module under the `arina_grid_di` logger.
 
 <br />

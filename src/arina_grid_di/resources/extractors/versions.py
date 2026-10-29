@@ -5,7 +5,7 @@ from __future__ import annotations
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import path_template, maybe_transform, async_maybe_transform, strip_not_given
+from ..._utils import path_template, strip_not_given
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -16,7 +16,6 @@ from ..._response import (
 )
 from ..._base_client import make_request_options
 from ...types.extractors.extractor_version_list import ExtractorVersionList
-from ...types.extractors import version_list_params, version_retrieve_params
 from ...types.extractors.extractor_version import ExtractorVersion
 
 __all__ = ["VersionsResource", "AsyncVersionsResource"]
@@ -35,7 +34,6 @@ class VersionsResource(SyncAPIResource):
         self,
         extractor_id: str,
         *,
-        organization_id: str,
         x_api_version: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -49,7 +47,6 @@ class VersionsResource(SyncAPIResource):
 
         Args:
             extractor_id: Path parameter.
-            organization_id: Tenant that owns the resource.
             x_api_version: Contract version. Currently only `2026-09-05`. Omit to get the current version. An unsupported value is rejected with 400.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
@@ -61,9 +58,8 @@ class VersionsResource(SyncAPIResource):
 
         Example:
             ```python
-            version = client.extractors.versions.list(
+            extractor_versions = client.extractors.versions.list(
                 extractor_id="extractorId",
-                organization_id="organization_id",
             )
             ```
         """
@@ -73,11 +69,7 @@ class VersionsResource(SyncAPIResource):
         return self._get(
             path_template("/extractors/{extractor_id}/versions", **{"extractor_id": extractor_id}),
             options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                query=maybe_transform({"organization_id": organization_id}, version_list_params.VersionListParams),
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
             cast_to=ExtractorVersionList,
         )
@@ -87,7 +79,6 @@ class VersionsResource(SyncAPIResource):
         version: int,
         *,
         extractor_id: str,
-        organization_id: str,
         x_api_version: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -102,7 +93,6 @@ class VersionsResource(SyncAPIResource):
         Args:
             version: Path parameter.
             extractor_id: Path parameter.
-            organization_id: Tenant that owns the resource.
             x_api_version: Contract version. Currently only `2026-09-05`. Omit to get the current version. An unsupported value is rejected with 400.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
@@ -117,7 +107,6 @@ class VersionsResource(SyncAPIResource):
             version = client.extractors.versions.retrieve(
                 extractor_id="extractorId",
                 version=1,
-                organization_id="organization_id",
             )
             ```
         """
@@ -131,13 +120,7 @@ class VersionsResource(SyncAPIResource):
                 "/extractors/{extractor_id}/versions/{version}", **{"extractor_id": extractor_id, "version": version}
             ),
             options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                query=maybe_transform(
-                    {"organization_id": organization_id}, version_retrieve_params.VersionRetrieveParams
-                ),
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
             cast_to=ExtractorVersion,
         )
@@ -156,7 +139,6 @@ class AsyncVersionsResource(AsyncAPIResource):
         self,
         extractor_id: str,
         *,
-        organization_id: str,
         x_api_version: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -170,7 +152,6 @@ class AsyncVersionsResource(AsyncAPIResource):
 
         Args:
             extractor_id: Path parameter.
-            organization_id: Tenant that owns the resource.
             x_api_version: Contract version. Currently only `2026-09-05`. Omit to get the current version. An unsupported value is rejected with 400.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
@@ -182,9 +163,8 @@ class AsyncVersionsResource(AsyncAPIResource):
 
         Example:
             ```python
-            version = await client.extractors.versions.list(
+            extractor_versions = await client.extractors.versions.list(
                 extractor_id="extractorId",
-                organization_id="organization_id",
             )
             ```
         """
@@ -194,13 +174,7 @@ class AsyncVersionsResource(AsyncAPIResource):
         return await self._get(
             path_template("/extractors/{extractor_id}/versions", **{"extractor_id": extractor_id}),
             options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                query=await async_maybe_transform(
-                    {"organization_id": organization_id}, version_list_params.VersionListParams
-                ),
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
             cast_to=ExtractorVersionList,
         )
@@ -210,7 +184,6 @@ class AsyncVersionsResource(AsyncAPIResource):
         version: int,
         *,
         extractor_id: str,
-        organization_id: str,
         x_api_version: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -225,7 +198,6 @@ class AsyncVersionsResource(AsyncAPIResource):
         Args:
             version: Path parameter.
             extractor_id: Path parameter.
-            organization_id: Tenant that owns the resource.
             x_api_version: Contract version. Currently only `2026-09-05`. Omit to get the current version. An unsupported value is rejected with 400.
             extra_headers: Send extra headers with the request.
             extra_query: Send extra query parameters with the request.
@@ -240,7 +212,6 @@ class AsyncVersionsResource(AsyncAPIResource):
             version = await client.extractors.versions.retrieve(
                 extractor_id="extractorId",
                 version=1,
-                organization_id="organization_id",
             )
             ```
         """
@@ -254,13 +225,7 @@ class AsyncVersionsResource(AsyncAPIResource):
                 "/extractors/{extractor_id}/versions/{version}", **{"extractor_id": extractor_id, "version": version}
             ),
             options=make_request_options(
-                extra_headers=extra_headers,
-                extra_query=extra_query,
-                extra_body=extra_body,
-                timeout=timeout,
-                query=await async_maybe_transform(
-                    {"organization_id": organization_id}, version_retrieve_params.VersionRetrieveParams
-                ),
+                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
             cast_to=ExtractorVersion,
         )

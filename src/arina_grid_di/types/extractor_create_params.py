@@ -13,8 +13,6 @@ __all__ = ["ExtractorCreateParams"]
 
 
 class ExtractorCreateParams(TypedDict, total=False):
-    organization_id: Required[Annotated[str, PropertyInfo(alias="organizationId")]]
-
     name: Required[str]
 
     description: Optional[str]
