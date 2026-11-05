@@ -1,5 +1,22 @@
 """Hand-written helpers on top of the generated client. Not touched by scripts/import_sdk.py."""
 
+from .batches import (
+    BATCH_COMPLETED,
+    DOCUMENT_TYPES,
+    MAX_BATCH_BYTES,
+    MAX_BATCH_FILES,
+    MAX_FILE_BYTES,
+    BatchTimeoutError,
+    plan_batches,
+    submit_extract_batches,
+    submit_extract_batches_async,
+    submit_parse_batches,
+    submit_parse_batches_async,
+    wait_for_extract_batch,
+    wait_for_extract_batch_async,
+    wait_for_parse_batch,
+    wait_for_parse_batch_async,
+)
 from .polling import (
     TERMINAL_STATUSES,
     RunFailedError,
@@ -11,11 +28,26 @@ from .polling import (
 )
 
 __all__ = [
+    "BATCH_COMPLETED",
+    "DOCUMENT_TYPES",
+    "MAX_BATCH_BYTES",
+    "MAX_BATCH_FILES",
+    "MAX_FILE_BYTES",
     "TERMINAL_STATUSES",
+    "BatchTimeoutError",
     "RunFailedError",
     "RunTimeoutError",
+    "plan_batches",
+    "submit_extract_batches",
+    "submit_extract_batches_async",
+    "submit_parse_batches",
+    "submit_parse_batches_async",
+    "wait_for_extract_batch",
+    "wait_for_extract_batch_async",
     "wait_for_extract_run",
     "wait_for_extract_run_async",
+    "wait_for_parse_batch",
+    "wait_for_parse_batch_async",
     "wait_for_parse_run",
     "wait_for_parse_run_async",
 ]

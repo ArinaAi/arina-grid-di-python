@@ -12,6 +12,7 @@ The full API of this library can be found in [api.md](./api.md).
 - [Authentication](#authentication)
 - [Usage](#usage)
 - [Waiting for a run](#waiting-for-a-run)
+- [Many documents at once](#many-documents-at-once)
 - [API Reference](./api.md)
 - [Async](#async)
 - [Errors](#errors)
@@ -144,6 +145,47 @@ with open("page.jpg", "wb") as fh:
 `RunFailedError` (the run is on `.run`); pass `raise_on_failure=False` to get it back
 instead. Exceeding `timeout` raises `RunTimeoutError`. Unknown statuses are treated as
 still running, because status is an open string.
+
+<br />
+
+## Many documents at once
+
+`POST /parse_runs/batches` and `POST /extract_runs/batches` take up to 100 documents under
+one `config` (15 MB each, 90 MB per request) and return a batch to poll instead of a
+hundred runs. Each document still becomes an ordinary run, listed in `batch.items` with its
+run id, so results are read from the runs as above. Batches need queued execution on the
+server; where it is off the endpoint answers 503.
+
+```python
+from arina_grid_di.lib import submit_extract_batches, wait_for_extract_batch, wait_for_extract_run
+
+# A directory, a file, or any list of paths (PDF, PNG, JPEG). The documents are checked
+# against the limits before anything is uploaded and split into as many requests as
+# needed; one batch comes back per request.
+batches = submit_extract_batches(client, "invoices/", {"config": {"jsonSchema": schema}})
+
+for batch in batches:
+    batch = wait_for_extract_batch(
+        client, batch.id, timeout=1800,
+        on_poll=lambda b: print(b.counts.processed, "of", b.counts.total, "done"),
+    )
+    for item in batch.items:
+        if item.status == "PROCESSED":
+            run = client.extraction.retrieve_extract_run(item.run_id)
+            print(item.document_name, run.output.value)
+        else:
+            print(item.document_name, "failed:", item.failure_reason, item.failure_message)
+```
+
+A batch is `COMPLETED` once every document is `PROCESSED` or `FAILED`; failures are counted in
+`batch.counts.failed` and named on the items, never raised, so a batch with two failed
+documents is still complete. `wait_for_extract_batch` raises `BatchTimeoutError` (the batch
+is on `.batch`) if that takes longer than `timeout`; the runs keep going server-side. The
+parse twins are `submit_parse_batches` and `wait_for_parse_batch`, and all four have `async`
+counterparts. To send one request yourself, call the generated methods directly:
+`client.parse.create_batch(files=[...], config=...)` and `client.parse.retrieve_batch(id)`
+(`create_extract_batch` / `retrieve_extract_batch` for extraction). Each member run also
+reports its `batch_id`.
 
 <br />
 

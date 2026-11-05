@@ -87,57 +87,113 @@ def _smoke_case_5() -> None:
 
 
 def _smoke_case_6() -> None:
-    parse = client.parse.create_run(
-        file=b"file",
-        config='{"config": {"includeTextLines": false}}',
+    extraction = client.extraction.create_extract_batch(
+        files=[b"file"],
+        config='{"config": {"jsonSchema": {"type": "object", "properties": {"invoiceNumber": {"type": ["string", "null"]}, "invoiceTotal": {"type": ["number", "null"], "description": "Total amount due"}}}, "citationsEnabled": true}}',
     )
 
 
 def _smoke_case_7() -> None:
-    parse = client.parse.create_run(
-        file=b"file",
-        config='{"config": {"includeTextLines": false}}',
+    extraction = client.extraction.create_extract_batch(
+        files=[b"file"],
+        config='{"config": {"jsonSchema": {"type": "object", "properties": {"invoiceNumber": {"type": ["string", "null"]}, "invoiceTotal": {"type": ["number", "null"], "description": "Total amount due"}}}, "citationsEnabled": true}}',
         x_api_version="2026-09-05",
     )
 
 
 def _smoke_case_8() -> None:
-    parse = client.parse.retrieve_run(
-        run_id="runId",
+    extraction = client.extraction.retrieve_extract_batch(
+        batch_id="batchId",
     )
 
 
 def _smoke_case_9() -> None:
-    parse = client.parse.retrieve_run(
-        run_id="runId",
+    extraction = client.extraction.retrieve_extract_batch(
+        batch_id="batchId",
         x_api_version="2026-09-05",
     )
 
 
 def _smoke_case_10() -> None:
-    parse = client.parse.list_run_page(
-        run_id="runId",
+    parse = client.parse.create_run(
+        file=b"file",
+        config='{"config": {"includeTextLines": false}}',
     )
 
 
 def _smoke_case_11() -> None:
-    parse = client.parse.list_run_page(
-        run_id="runId",
+    parse = client.parse.create_run(
+        file=b"file",
+        config='{"config": {"includeTextLines": false}}',
         x_api_version="2026-09-05",
     )
 
 
 def _smoke_case_12() -> None:
-    account = client.account.who_am_i()
+    parse = client.parse.retrieve_run(
+        run_id="runId",
+    )
 
 
 def _smoke_case_13() -> None:
-    account = client.account.who_am_i(
+    parse = client.parse.retrieve_run(
+        run_id="runId",
         x_api_version="2026-09-05",
     )
 
 
 def _smoke_case_14() -> None:
+    parse = client.parse.list_run_page(
+        run_id="runId",
+    )
+
+
+def _smoke_case_15() -> None:
+    parse = client.parse.list_run_page(
+        run_id="runId",
+        x_api_version="2026-09-05",
+    )
+
+
+def _smoke_case_16() -> None:
+    parse = client.parse.create_batch(
+        files=[b"file"],
+        config='{"config": {"includeTextLines": false}}',
+    )
+
+
+def _smoke_case_17() -> None:
+    parse = client.parse.create_batch(
+        files=[b"file"],
+        config='{"config": {"includeTextLines": false}}',
+        x_api_version="2026-09-05",
+    )
+
+
+def _smoke_case_18() -> None:
+    parse = client.parse.retrieve_batch(
+        batch_id="batchId",
+    )
+
+
+def _smoke_case_19() -> None:
+    parse = client.parse.retrieve_batch(
+        batch_id="batchId",
+        x_api_version="2026-09-05",
+    )
+
+
+def _smoke_case_20() -> None:
+    account = client.account.who_am_i()
+
+
+def _smoke_case_21() -> None:
+    account = client.account.who_am_i(
+        x_api_version="2026-09-05",
+    )
+
+
+def _smoke_case_22() -> None:
     extractor = client.extractors.create(
         name="Invoice — EU vendors",
         description=None,
@@ -149,7 +205,7 @@ def _smoke_case_14() -> None:
     )
 
 
-def _smoke_case_15() -> None:
+def _smoke_case_23() -> None:
     extractor = client.extractors.create(
         name="Invoice — EU vendors",
         description=None,
@@ -162,89 +218,89 @@ def _smoke_case_15() -> None:
     )
 
 
-def _smoke_case_16() -> None:
+def _smoke_case_24() -> None:
     extractors = client.extractors.list()
 
 
-def _smoke_case_17() -> None:
+def _smoke_case_25() -> None:
     extractors = client.extractors.list(
         status="ACTIVE",
         x_api_version="2026-09-05",
     )
 
 
-def _smoke_case_18() -> None:
-    extractor = client.extractors.retrieve(
-        extractor_id="extractorId",
-    )
-
-
-def _smoke_case_19() -> None:
-    extractor = client.extractors.retrieve(
-        extractor_id="extractorId",
-        x_api_version="2026-09-05",
-    )
-
-
-def _smoke_case_20() -> None:
-    extractor = client.extractors.update(
-        extractor_id="extractorId",
-        name=None,
-        description=None,
-        config=None,
-        metadata=None,
-        version=None,
-    )
-
-
-def _smoke_case_21() -> None:
-    extractor = client.extractors.update(
-        extractor_id="extractorId",
-        name=None,
-        description=None,
-        config=None,
-        metadata=None,
-        version=None,
-        x_api_version="2026-09-05",
-    )
-
-
-def _smoke_case_22() -> None:
-    extractor = client.extractors.delete(
-        extractor_id="extractorId",
-        permanent=False,
-    )
-
-
-def _smoke_case_23() -> None:
-    extractor = client.extractors.delete(
-        extractor_id="extractorId",
-        permanent=False,
-        x_api_version="2026-09-05",
-    )
-
-
-def _smoke_case_24() -> None:
-    extractor_versions = client.extractors.versions.list(
-        extractor_id="extractorId",
-    )
-
-
-def _smoke_case_25() -> None:
-    extractor_versions = client.extractors.versions.list(
-        extractor_id="extractorId",
-        x_api_version="2026-09-05",
-    )
-
-
 def _smoke_case_26() -> None:
+    extractor = client.extractors.retrieve(
+        extractor_id="extractorId",
+    )
+
+
+def _smoke_case_27() -> None:
+    extractor = client.extractors.retrieve(
+        extractor_id="extractorId",
+        x_api_version="2026-09-05",
+    )
+
+
+def _smoke_case_28() -> None:
+    extractor = client.extractors.update(
+        extractor_id="extractorId",
+        name=None,
+        description=None,
+        config=None,
+        metadata=None,
+        version=None,
+    )
+
+
+def _smoke_case_29() -> None:
+    extractor = client.extractors.update(
+        extractor_id="extractorId",
+        name=None,
+        description=None,
+        config=None,
+        metadata=None,
+        version=None,
+        x_api_version="2026-09-05",
+    )
+
+
+def _smoke_case_30() -> None:
+    extractor = client.extractors.delete(
+        extractor_id="extractorId",
+        permanent=False,
+    )
+
+
+def _smoke_case_31() -> None:
+    extractor = client.extractors.delete(
+        extractor_id="extractorId",
+        permanent=False,
+        x_api_version="2026-09-05",
+    )
+
+
+def _smoke_case_32() -> None:
+    extractor_versions = client.extractors.versions.list(
+        extractor_id="extractorId",
+    )
+
+
+def _smoke_case_33() -> None:
+    extractor_versions = client.extractors.versions.list(
+        extractor_id="extractorId",
+        x_api_version="2026-09-05",
+    )
+
+
+def _smoke_case_34() -> None:
     version = client.extractors.versions.retrieve(
         extractor_id="extractorId",
         version=1,
     )
 
 
-def _smoke_case_27() -> None:
+def _smoke_case_35() -> None:
     version = client.extractors.versions.retrieve(
         extractor_id="extractorId",
         version=1,
@@ -296,158 +352,214 @@ cases: list[SmokeCase] = [
         "run": _smoke_case_5,
     },
     {
-        "operation": "createRun",
+        "operation": "createExtractBatch",
         "method": "POST",
-        "path": "/parse_runs",
+        "path": "/extract_runs/batches",
         "label": "required params",
         "run": _smoke_case_6,
     },
     {
-        "operation": "createRun",
+        "operation": "createExtractBatch",
         "method": "POST",
-        "path": "/parse_runs",
+        "path": "/extract_runs/batches",
         "label": "all params",
         "run": _smoke_case_7,
     },
     {
-        "operation": "retrieveRun",
+        "operation": "retrieveExtractBatch",
         "method": "GET",
-        "path": "/parse_runs/{run_id}",
+        "path": "/extract_runs/batches/{batch_id}",
         "label": "required params",
         "run": _smoke_case_8,
     },
     {
-        "operation": "retrieveRun",
+        "operation": "retrieveExtractBatch",
         "method": "GET",
-        "path": "/parse_runs/{run_id}",
+        "path": "/extract_runs/batches/{batch_id}",
         "label": "all params",
         "run": _smoke_case_9,
     },
     {
-        "operation": "listRunPage",
-        "method": "GET",
-        "path": "/parse_runs/{run_id}/page",
+        "operation": "createRun",
+        "method": "POST",
+        "path": "/parse_runs",
         "label": "required params",
         "run": _smoke_case_10,
     },
     {
-        "operation": "listRunPage",
-        "method": "GET",
-        "path": "/parse_runs/{run_id}/page",
+        "operation": "createRun",
+        "method": "POST",
+        "path": "/parse_runs",
         "label": "all params",
         "run": _smoke_case_11,
     },
     {
-        "operation": "whoAmI",
+        "operation": "retrieveRun",
         "method": "GET",
-        "path": "/me",
+        "path": "/parse_runs/{run_id}",
         "label": "required params",
         "run": _smoke_case_12,
     },
     {
-        "operation": "whoAmI",
+        "operation": "retrieveRun",
         "method": "GET",
-        "path": "/me",
+        "path": "/parse_runs/{run_id}",
         "label": "all params",
         "run": _smoke_case_13,
     },
     {
-        "operation": "create",
-        "method": "POST",
-        "path": "/extractors",
+        "operation": "listRunPage",
+        "method": "GET",
+        "path": "/parse_runs/{run_id}/page",
         "label": "required params",
         "run": _smoke_case_14,
     },
     {
-        "operation": "create",
-        "method": "POST",
-        "path": "/extractors",
+        "operation": "listRunPage",
+        "method": "GET",
+        "path": "/parse_runs/{run_id}/page",
         "label": "all params",
         "run": _smoke_case_15,
     },
     {
-        "operation": "list",
-        "method": "GET",
-        "path": "/extractors",
+        "operation": "createBatch",
+        "method": "POST",
+        "path": "/parse_runs/batches",
         "label": "required params",
         "run": _smoke_case_16,
     },
     {
-        "operation": "list",
-        "method": "GET",
-        "path": "/extractors",
+        "operation": "createBatch",
+        "method": "POST",
+        "path": "/parse_runs/batches",
         "label": "all params",
         "run": _smoke_case_17,
     },
     {
-        "operation": "retrieve",
+        "operation": "retrieveBatch",
         "method": "GET",
-        "path": "/extractors/{extractor_id}",
+        "path": "/parse_runs/batches/{batch_id}",
         "label": "required params",
         "run": _smoke_case_18,
     },
     {
-        "operation": "retrieve",
+        "operation": "retrieveBatch",
         "method": "GET",
-        "path": "/extractors/{extractor_id}",
+        "path": "/parse_runs/batches/{batch_id}",
         "label": "all params",
         "run": _smoke_case_19,
     },
     {
-        "operation": "update",
-        "method": "PATCH",
-        "path": "/extractors/{extractor_id}",
+        "operation": "whoAmI",
+        "method": "GET",
+        "path": "/me",
         "label": "required params",
         "run": _smoke_case_20,
     },
     {
-        "operation": "update",
-        "method": "PATCH",
-        "path": "/extractors/{extractor_id}",
+        "operation": "whoAmI",
+        "method": "GET",
+        "path": "/me",
         "label": "all params",
         "run": _smoke_case_21,
     },
     {
-        "operation": "delete",
-        "method": "DELETE",
-        "path": "/extractors/{extractor_id}",
+        "operation": "create",
+        "method": "POST",
+        "path": "/extractors",
         "label": "required params",
         "run": _smoke_case_22,
     },
     {
-        "operation": "delete",
-        "method": "DELETE",
-        "path": "/extractors/{extractor_id}",
+        "operation": "create",
+        "method": "POST",
+        "path": "/extractors",
         "label": "all params",
         "run": _smoke_case_23,
     },
     {
         "operation": "list",
         "method": "GET",
-        "path": "/extractors/{extractor_id}/versions",
+        "path": "/extractors",
         "label": "required params",
         "run": _smoke_case_24,
     },
     {
         "operation": "list",
         "method": "GET",
-        "path": "/extractors/{extractor_id}/versions",
+        "path": "/extractors",
         "label": "all params",
         "run": _smoke_case_25,
     },
     {
         "operation": "retrieve",
         "method": "GET",
-        "path": "/extractors/{extractor_id}/versions/{version}",
+        "path": "/extractors/{extractor_id}",
         "label": "required params",
         "run": _smoke_case_26,
     },
     {
         "operation": "retrieve",
         "method": "GET",
-        "path": "/extractors/{extractor_id}/versions/{version}",
+        "path": "/extractors/{extractor_id}",
         "label": "all params",
         "run": _smoke_case_27,
+    },
+    {
+        "operation": "update",
+        "method": "PATCH",
+        "path": "/extractors/{extractor_id}",
+        "label": "required params",
+        "run": _smoke_case_28,
+    },
+    {
+        "operation": "update",
+        "method": "PATCH",
+        "path": "/extractors/{extractor_id}",
+        "label": "all params",
+        "run": _smoke_case_29,
+    },
+    {
+        "operation": "delete",
+        "method": "DELETE",
+        "path": "/extractors/{extractor_id}",
+        "label": "required params",
+        "run": _smoke_case_30,
+    },
+    {
+        "operation": "delete",
+        "method": "DELETE",
+        "path": "/extractors/{extractor_id}",
+        "label": "all params",
+        "run": _smoke_case_31,
+    },
+    {
+        "operation": "list",
+        "method": "GET",
+        "path": "/extractors/{extractor_id}/versions",
+        "label": "required params",
+        "run": _smoke_case_32,
+    },
+    {
+        "operation": "list",
+        "method": "GET",
+        "path": "/extractors/{extractor_id}/versions",
+        "label": "all params",
+        "run": _smoke_case_33,
+    },
+    {
+        "operation": "retrieve",
+        "method": "GET",
+        "path": "/extractors/{extractor_id}/versions/{version}",
+        "label": "required params",
+        "run": _smoke_case_34,
+    },
+    {
+        "operation": "retrieve",
+        "method": "GET",
+        "path": "/extractors/{extractor_id}/versions/{version}",
+        "label": "all params",
+        "run": _smoke_case_35,
     },
 ]
 

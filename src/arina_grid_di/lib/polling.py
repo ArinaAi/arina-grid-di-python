@@ -73,19 +73,24 @@ def _poll(
     timeout: float,
     interval: float,
     max_interval: float,
-    raise_on_failure: bool,
+    check: Callable[[RunT], RunT | None],
+    timed_out: Callable[[RunT, float], Exception],
 ) -> RunT:
+    """Call ``fetch`` until ``check`` returns a result; raise ``timed_out(last, timeout)`` at the deadline.
+
+    Shared by the run and batch waiters: they differ only in what counts as done.
+    """
     max_interval = _validate(timeout, interval, max_interval)
     deadline = time.monotonic() + timeout
     delay = interval
     while True:
-        run = fetch()
-        done = _check_terminal(run, raise_on_failure=raise_on_failure)
+        current = fetch()
+        done = check(current)
         if done is not None:
             return done
         remaining = deadline - time.monotonic()
         if remaining <= 0:
-            raise RunTimeoutError(run, timeout)  # type: ignore[arg-type]
+            raise timed_out(current, timeout)
         time.sleep(min(delay, remaining))
         delay = min(delay * _BACKOFF, max_interval)
 
@@ -96,21 +101,27 @@ async def _poll_async(
     timeout: float,
     interval: float,
     max_interval: float,
-    raise_on_failure: bool,
+    check: Callable[[RunT], RunT | None],
+    timed_out: Callable[[RunT, float], Exception],
 ) -> RunT:
+    """Async :func:`_poll`."""
     max_interval = _validate(timeout, interval, max_interval)
     deadline = time.monotonic() + timeout
     delay = interval
     while True:
-        run = await fetch()
-        done = _check_terminal(run, raise_on_failure=raise_on_failure)
+        current = await fetch()
+        done = check(current)
         if done is not None:
             return done
         remaining = deadline - time.monotonic()
         if remaining <= 0:
-            raise RunTimeoutError(run, timeout)  # type: ignore[arg-type]
+            raise timed_out(current, timeout)
         await asyncio.sleep(min(delay, remaining))
         delay = min(delay * _BACKOFF, max_interval)
+
+
+def _run_checks(raise_on_failure: bool) -> Callable[[RunT], RunT | None]:
+    return lambda run: _check_terminal(run, raise_on_failure=raise_on_failure)
 
 
 def wait_for_extract_run(
@@ -134,7 +145,8 @@ def wait_for_extract_run(
         timeout=timeout,
         interval=interval,
         max_interval=max_interval,
-        raise_on_failure=raise_on_failure,
+        check=_run_checks(raise_on_failure),
+        timed_out=RunTimeoutError,
     )
 
 
@@ -156,7 +168,8 @@ def wait_for_parse_run(
         timeout=timeout,
         interval=interval,
         max_interval=max_interval,
-        raise_on_failure=raise_on_failure,
+        check=_run_checks(raise_on_failure),
+        timed_out=RunTimeoutError,
     )
 
 
@@ -175,7 +188,8 @@ async def wait_for_extract_run_async(
         timeout=timeout,
         interval=interval,
         max_interval=max_interval,
-        raise_on_failure=raise_on_failure,
+        check=_run_checks(raise_on_failure),
+        timed_out=RunTimeoutError,
     )
 
 
@@ -194,5 +208,6 @@ async def wait_for_parse_run_async(
         timeout=timeout,
         interval=interval,
         max_interval=max_interval,
-        raise_on_failure=raise_on_failure,
+        check=_run_checks(raise_on_failure),
+        timed_out=RunTimeoutError,
     )

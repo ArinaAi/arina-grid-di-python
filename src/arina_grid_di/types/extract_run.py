@@ -34,6 +34,9 @@ class ExtractRun(BaseModel):
 
     collection: Optional[str] = None
 
+    batch_id: Optional[str] = FieldInfo(alias="batchId", default=None)
+    """The batch this run was submitted in, if any ('pbt_…')"""
+
     config: ExtractConfig
     """
     Extraction parameters for one run.
