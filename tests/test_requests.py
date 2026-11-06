@@ -24,8 +24,9 @@ from arina_grid_di.types.extract_run import ExtractRun
 from arina_grid_di.types.extractor import Extractor
 from arina_grid_di.types.identity import Identity
 from arina_grid_di.types.parse_run import ParseRun
+from arina_grid_di.types.run_batch import RunBatch
 
-from .conftest import API_KEY, run_payload
+from .conftest import API_KEY, batch_payload, run_payload
 
 EXTRACT_CONFIG = {
     "config": {
@@ -128,6 +129,56 @@ class TestMultipartRuns:
         parts = rec.last_multipart()
         assert sorted(parts) == ["config", "file"]
         assert json.loads(parts["config"]["data"]) == EXTRACT_CONFIG
+
+
+class TestMultipartBatches:
+    """One request, many documents: the route reads repeated `files` parts and one `config` part."""
+
+    def test_parse_batch_sends_one_files_part_per_document_under_the_bare_name(self, make_client):
+        client, rec = make_client(lambda r: httpx.Response(202, json=batch_payload("parse_batch", status="PENDING")))
+
+        batch = client.parse.create_batch(
+            files=[("a.pdf", b"%PDF-1.4 a", "application/pdf"), ("b.png", b"\x89PNG b", "image/png")],
+            config=json.dumps(PARSE_CONFIG),
+        )
+
+        assert rec.last.method == "POST"
+        assert rec.last.url.path == "/parse_runs/batches"
+        parts = rec.parts_of(rec.last)
+        assert [name for name, _ in parts] == ["config", "files", "files"], "bare `files`, never `files[]`"
+        assert json.loads(parts[0][1]["data"]) == PARSE_CONFIG
+        assert [(p["filename"], p["content_type"], p["data"]) for _, p in parts[1:]] == [
+            ("a.pdf", "application/pdf", b"%PDF-1.4 a"),
+            ("b.png", "image/png", b"\x89PNG b"),
+        ]
+        assert isinstance(batch, RunBatch)
+        assert batch.id == "pbt_1" and batch.status == "PENDING"
+        assert batch.items is not None and batch.items[0].run_id == "run_1"
+
+    def test_extract_batch_posts_to_the_extract_route(self, make_client):
+        client, rec = make_client(lambda r: httpx.Response(202, json=batch_payload("extract_batch")))
+        client.extraction.create_extract_batch(files=[b"x"], config=json.dumps(EXTRACT_CONFIG))
+        assert rec.last.url.path == "/extract_runs/batches"
+        assert [name for name, _ in rec.parts_of(rec.last)] == ["config", "files"]
+
+    def test_retrieve_batch_is_a_bare_get(self, make_client):
+        client, rec = make_client(lambda r: httpx.Response(200, json=batch_payload("extract_batch")))
+        batch = client.extraction.retrieve_extract_batch("pbt_1")
+        assert rec.last.method == "GET"
+        assert rec.last.url.path == "/extract_runs/batches/pbt_1"
+        assert batch.counts is not None and (batch.counts.processed, batch.counts.pending) == (1, 1)
+
+    def test_a_member_run_carries_its_batch_id_and_a_single_run_none(self, make_client):
+        client, _ = make_client(lambda r: httpx.Response(200, json=run_payload("parse_run", batchId="pbt_1")))
+        assert client.parse.retrieve_run("run_1").batch_id == "pbt_1"
+        client, _ = make_client(lambda r: httpx.Response(200, json=run_payload("parse_run", batchId=None)))
+        assert client.parse.retrieve_run("run_1").batch_id is None
+
+    @pytest.mark.asyncio
+    async def test_async_client_sends_the_same_parts(self, make_async_client):
+        client, rec = make_async_client(lambda r: httpx.Response(202, json=batch_payload("parse_batch")))
+        await client.parse.create_batch(files=[b"a", b"b"], config="{}")
+        assert [name for name, _ in rec.parts_of(rec.last)] == ["config", "files", "files"]
 
 
 class TestHeaders:

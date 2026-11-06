@@ -16,6 +16,9 @@ from .parse_output import ParseOutput as ParseOutput
 from .table import Table as Table
 from .text_line import TextLine as TextLine
 from .parse_run import ParseRun as ParseRun
+from .batch_counts import BatchCounts as BatchCounts
+from .batch_item import BatchItem as BatchItem
+from .run_batch import RunBatch as RunBatch
 from .extractor import Extractor as Extractor
 from .extractor_list import ExtractorList as ExtractorList
 from .identity_organization import IdentityOrganization as IdentityOrganization
@@ -23,7 +26,11 @@ from .identity_user import IdentityUser as IdentityUser
 from .identity import Identity as Identity
 from .extract_config_param import ExtractConfigParam as ExtractConfigParam
 from .extraction_create_extract_run_params import ExtractionCreateExtractRunParams as ExtractionCreateExtractRunParams
+from .extraction_create_extract_batch_params import (
+    ExtractionCreateExtractBatchParams as ExtractionCreateExtractBatchParams,
+)
 from .parse_create_run_params import ParseCreateRunParams as ParseCreateRunParams
+from .parse_create_batch_params import ParseCreateBatchParams as ParseCreateBatchParams
 from .extractor_create_params import ExtractorCreateParams as ExtractorCreateParams
 from .extractor_list_params import ExtractorListParams as ExtractorListParams
 from .extractor_update_params import ExtractorUpdateParams as ExtractorUpdateParams

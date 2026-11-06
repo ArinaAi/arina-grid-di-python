@@ -44,25 +44,70 @@ def run_payload(kind: str = "extract_run", **overrides: object) -> dict:
     return body
 
 
-def parse_multipart(content_type: str, body: bytes) -> dict[str, dict]:
-    """Parse a multipart/form-data body with the stdlib email parser.
+def batch_payload(kind: str = "parse_batch", **overrides: object) -> dict:
+    """A minimal valid batch body, as the API returns it: two documents, one done, one waiting."""
+    body: dict = {
+        "object": kind,
+        "id": "pbt_1",
+        "apiVersion": "2026-09-05",
+        "status": "PROCESSING",
+        "counts": {"total": 2, "pending": 1, "processing": 0, "processed": 1, "failed": 0},
+        "items": [
+            {
+                "documentName": "a.pdf",
+                "runId": "run_1",
+                "status": "PROCESSED",
+                "failureReason": None,
+                "failureMessage": None,
+            },
+            {
+                "documentName": "b.pdf",
+                "runId": "run_2",
+                "status": "PENDING",
+                "failureReason": None,
+                "failureMessage": None,
+            },
+        ],
+        "organizationId": "org_123",
+        "config": {},
+        "metadata": None,
+        "createdAt": "2026-01-01T00:00:00Z",
+        "updatedAt": "2026-01-01T00:00:00Z",
+    }
+    body.update(overrides)
+    return body
 
-    Returns ``{field_name: {"data": bytes, "filename": str | None, "content_type": str | None}}``.
+
+def multipart_parts(content_type: str, body: bytes) -> list[tuple[str, dict]]:
+    """Parse a multipart/form-data body with the stdlib email parser, one entry per part, in order.
+
+    Each entry is ``(field_name, {"data": bytes, "filename": str | None, "content_type": str | None})``;
+    a name repeated on the wire (``files``) appears once per part.
     """
     message = BytesParser(policy=HTTP).parsebytes(
         b"Content-Type: " + content_type.encode() + b"\r\nMIME-Version: 1.0\r\n\r\n" + body
     )
     assert message.is_multipart(), "expected a multipart body"
-    parts: dict[str, dict] = {}
+    parts: list[tuple[str, dict]] = []
     for part in message.iter_parts():
         name = part.get_param("name", header="content-disposition")
         assert name is not None, "multipart part without a field name"
-        parts[name] = {
-            "data": part.get_payload(decode=True),
-            "filename": part.get_filename(),
-            "content_type": part.get_content_type() if "content-type" in part else None,
-        }
+        parts.append(
+            (
+                name,
+                {
+                    "data": part.get_payload(decode=True),
+                    "filename": part.get_filename(),
+                    "content_type": part.get_content_type() if "content-type" in part else None,
+                },
+            )
+        )
     return parts
+
+
+def parse_multipart(content_type: str, body: bytes) -> dict[str, dict]:
+    """``multipart_parts`` keyed by field name, for bodies where every name occurs once."""
+    return dict(multipart_parts(content_type, body))
 
 
 @dataclass
@@ -83,6 +128,10 @@ class Recorder:
 
     def last_multipart(self) -> dict[str, dict]:
         return parse_multipart(self.last.headers["content-type"], self.last.content)
+
+    @staticmethod
+    def parts_of(request: httpx.Request) -> list[tuple[str, dict]]:
+        return multipart_parts(request.headers["content-type"], request.content)
 
     def last_json(self) -> object:
         return json.loads(self.last.content)

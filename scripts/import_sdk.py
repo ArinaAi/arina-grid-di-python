@@ -9,8 +9,10 @@ package is renamed to arina_grid_di when the generator was configured with anoth
 name; the version in pyproject.toml is written back into the generated _version.py; environment variable names
 are rewritten to the ARINA_GRID_* family and the distribution name in shipped docs to the
 one in pyproject.toml (the generator derives both from the API title and offers no setting);
-and the placeholder default base URL the generator emits when no environment is configured
-is replaced by an error (a client must never fall back to a host we do not own).
+the placeholder default base URL the generator emits when no environment is configured
+is replaced by an error (a client must never fall back to a host we do not own); and multipart
+file arrays are sent as repeated bare field names (``files``), which is what the API reads,
+instead of the generator's default ``files[]``.
 See CONTRIBUTING.md.
 """
 
@@ -264,6 +266,38 @@ def patch_placeholder_base_url() -> str:
     return "placeholder default base URL replaced with a required-option error (sync + async)"
 
 
+# One call per line: `extract_files(cast(...), paths=[["files", "<array>"]])`, not yet given a format.
+MULTIPART_ARRAY_RE = re.compile(r'extract_files\((?P<args>.*?paths=\[\[[^\]]*"<array>"[^\]]*\]\])\)')
+
+
+def patch_multipart_arrays() -> str:
+    """Send multipart file arrays as repeated ``files`` parts, the form the API reads.
+
+    The generated runtime can emit array parts four ways and the resource methods leave it at
+    the default, ``files[]``; the API (FastAPI) only reads repeated bare names and answers 422
+    to the bracketed form. Pass ``array_format="repeat"`` at every ``<array>`` extraction. If the
+    generator starts passing a format itself this finds nothing and does nothing.
+    """
+    patched = 0
+    already = 0
+    for path in (PACKAGE / "resources").rglob("*.py"):
+        text = path.read_text(encoding="utf-8")
+        already += text.count('"<array>"]], array_format=')
+
+        def replacement(match: re.Match) -> str:
+            return f'extract_files({match["args"]}, array_format="repeat")'
+
+        new_text, count = MULTIPART_ARRAY_RE.subn(replacement, text)
+        if count:
+            path.write_text(new_text, encoding="utf-8")
+            patched += count
+    if patched:
+        return f"multipart file arrays sent as repeated bare parts ({patched} call sites)"
+    if already:
+        return f"generated code already names its {already} multipart array parts; no patch needed"
+    return "no multipart file arrays in the generated code; no patch needed"
+
+
 def main(argv: list[str]) -> int:
     if len(argv) != 2:
         print(__doc__)
@@ -282,6 +316,7 @@ def main(argv: list[str]) -> int:
     version = restore_version()
     renamed = rename_env_vars()
     patched = patch_placeholder_base_url()
+    arrays = patch_multipart_arrays()
 
     print("\nimport complete")
     print(f"  replaced (generated): {', '.join(replaced)}")
@@ -294,6 +329,7 @@ def main(argv: list[str]) -> int:
     print(f"  import:   {import_name}")
     print(f"  env vars: {renamed}")
     print(f"  base url: {patched}")
+    print(f"  arrays:   {arrays}")
     print("\nnext: pytest, then commit as feat:/fix: describing the API change.")
     return 0
 

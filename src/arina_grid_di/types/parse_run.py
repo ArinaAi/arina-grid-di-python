@@ -34,6 +34,9 @@ class ParseRun(BaseModel):
 
     collection: Optional[str] = None
 
+    batch_id: Optional[str] = FieldInfo(alias="batchId", default=None)
+    """The batch this run was submitted in, if any ('pbt_…')"""
+
     config: Optional[ParseConfig] = None
     """Options for a parse run. Every option has a default, so ``config`` may be omitted."""
 
