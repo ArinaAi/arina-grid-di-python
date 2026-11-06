@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/ArinaAi/arina-grid-di-python/compare/v0.2.0...v0.3.0) (2026-11-06)
+
+
+### Features
+
+* batches — submit many documents in one request and wait for the batch ([#12](https://github.com/ArinaAi/arina-grid-di-python/issues/12)) ([524d699](https://github.com/ArinaAi/arina-grid-di-python/commit/524d699b117704da9e8eab64dfc318183a362451))
+
 ## [0.2.0](https://github.com/ArinaAi/arina-grid-di-python/compare/v0.1.1...v0.2.0) (2026-10-29)
 
 
