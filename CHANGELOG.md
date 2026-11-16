@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/ArinaAi/arina-grid-di-python/compare/v0.2.0...v0.3.0) (2026-11-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* the package requires Python 3.11 or newer; pip refuses to install it on 3.9 and 3.10.
+
+### Features
+
+* batches — submit many documents in one request and wait for the batch ([#12](https://github.com/ArinaAi/arina-grid-di-python/issues/12)) ([524d699](https://github.com/ArinaAi/arina-grid-di-python/commit/524d699b117704da9e8eab64dfc318183a362451))
+* require Python 3.11 or newer ([#14](https://github.com/ArinaAi/arina-grid-di-python/issues/14)) ([09b2d75](https://github.com/ArinaAi/arina-grid-di-python/commit/09b2d75c05729359628e9bcec48a93798d041209))
+
 ## [0.2.0](https://github.com/ArinaAi/arina-grid-di-python/compare/v0.1.1...v0.2.0) (2026-10-29)
 
 
