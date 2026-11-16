@@ -37,7 +37,8 @@ environment variables the generator derives from the API title and the security 
 `ARINA_BASE_URL`, `ARINA_LOG`, `ARINA_CUSTOM_HEADERS`) to the `ARINA_GRID_*` family, and replaces the
 generator's placeholder default host (`https://example.com`, emitted when
 no environment is configured) with a "base_url is required" error so a key can never be sent to a host we
-do not own. Once a production environment is configured in the generator, that step is a no-op.
+do not own. Once a production environment is configured in the generator, that step is a no-op. It also rewrites the generator's "Python 3.9 or newer" line in the shipped docs to the
+floor in `pyproject.toml`'s `requires-python`.
 
 ## Commit messages
 

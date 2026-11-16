@@ -69,7 +69,7 @@ except APIStatusError as err:
 
 ## Requirements
 
-- Python 3.9 or newer
+- Python 3.11 or newer
 
 ## Reference files
 

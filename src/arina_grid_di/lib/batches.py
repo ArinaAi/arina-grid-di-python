@@ -11,7 +11,7 @@ import json
 import os
 from collections.abc import Awaitable, Callable, Iterable, Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, BinaryIO, Union
+from typing import TYPE_CHECKING, Any, BinaryIO
 
 from .polling import _poll, _poll_async
 
@@ -41,8 +41,8 @@ DEFAULT_BATCH_INTERVAL = 2.0
 DEFAULT_BATCH_MAX_INTERVAL = 10.0
 
 #: A directory, one file, or any iterable of files.
-Documents = Union[str, "os.PathLike[str]", Iterable[Union[str, "os.PathLike[str]"]]]
-Config = Union[str, Mapping[str, Any]]
+Documents = str | os.PathLike[str] | Iterable[str | os.PathLike[str]]
+Config = str | Mapping[str, Any]
 
 
 class BatchTimeoutError(TimeoutError):
@@ -216,7 +216,9 @@ def _config_json(config: Config) -> str:
 
 
 def _parts(group: list[Path], handles: list[BinaryIO]) -> list[tuple[str, BinaryIO, str]]:
-    return [(path.name, handle, DOCUMENT_TYPES[path.suffix.lower()]) for path, handle in zip(group, handles)]
+    return [
+        (path.name, handle, DOCUMENT_TYPES[path.suffix.lower()]) for path, handle in zip(group, handles, strict=True)
+    ]
 
 
 def _submit(create: Callable[..., RunBatch], group: list[Path], config: str) -> RunBatch:

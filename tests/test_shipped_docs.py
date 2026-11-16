@@ -8,6 +8,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 DIST_NAME = re.search(r'^name\s*=\s*"([^"]+)"', (ROOT / "pyproject.toml").read_text(), re.M).group(1)
 IMPORT_NAME = DIST_NAME.replace("-", "_")
+FLOOR = re.search(r'^requires-python\s*=\s*">=\s*([\d.]+)"', (ROOT / "pyproject.toml").read_text(), re.M).group(1)
 DOCS = ["api.md", "SKILL.md", "README.md", ".claude/skills/arina-document-intelligence-api-python-sdk/SKILL.md"]
 
 
@@ -38,3 +39,12 @@ def test_no_request_in_the_docs_names_an_organization(name):
     assert "organization_id=" not in text, f"{name} passes organization_id to a method"
     assert '"organizationId":' not in text, f"{name} puts organizationId in a request body"
     assert "organizationId=" not in text, f"{name} puts organizationId in a query string"
+
+
+@pytest.mark.parametrize("name", [d for d in DOCS if d != "api.md"])
+def test_shipped_docs_state_the_supported_python_floor(name):
+    # The generator writes its own default ("3.9 or newer"); the import rewrites it from requires-python.
+    text = (ROOT / name).read_text()
+    assert f"Python {FLOOR} or newer" in text, f"{name} does not state the floor from pyproject.toml"
+    stale = set(re.findall(r"Python (\d+\.\d+) or newer", text)) - {FLOOR}
+    assert not stale, f"{name} still claims support for Python {sorted(stale)}"

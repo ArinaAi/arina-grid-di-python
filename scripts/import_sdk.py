@@ -270,6 +270,28 @@ def patch_placeholder_base_url() -> str:
 MULTIPART_ARRAY_RE = re.compile(r'extract_files\((?P<args>.*?paths=\[\[[^\]]*"<array>"[^\]]*\]\])\)')
 
 
+PYTHON_FLOOR_RE = re.compile(r'^requires-python\s*=\s*">=\s*(\d+\.\d+)"', re.MULTILINE)
+DOCS_FLOOR_RE = re.compile(r"Python (\d+\.\d+) or newer")
+
+
+def rename_python_floor() -> str:
+    """Make shipped docs state the floor in pyproject's requires-python, not the generator's default."""
+    match = PYTHON_FLOOR_RE.search(PYPROJECT.read_text(encoding="utf-8"))
+    if not match:
+        return "no requires-python floor in pyproject.toml; docs left alone"
+    floor = match.group(1)
+    count = 0
+    for path in _generated_text_files():
+        text = path.read_text(encoding="utf-8")
+        new_text, n = DOCS_FLOOR_RE.subn(f"Python {floor} or newer", text)
+        if new_text != text:
+            path.write_text(new_text, encoding="utf-8")
+            count += n
+    if not count:
+        return f"shipped docs already state Python {floor} or newer"
+    return f"shipped docs rewritten to Python {floor} or newer ({count})"
+
+
 def patch_multipart_arrays() -> str:
     """Send multipart file arrays as repeated ``files`` parts, the form the API reads.
 
@@ -316,6 +338,7 @@ def main(argv: list[str]) -> int:
     version = restore_version()
     renamed = rename_env_vars()
     patched = patch_placeholder_base_url()
+    floor = rename_python_floor()
     arrays = patch_multipart_arrays()
 
     print("\nimport complete")
@@ -329,6 +352,7 @@ def main(argv: list[str]) -> int:
     print(f"  import:   {import_name}")
     print(f"  env vars: {renamed}")
     print(f"  base url: {patched}")
+    print(f"  floor:    {floor}")
     print(f"  arrays:   {arrays}")
     print("\nnext: pytest, then commit as feat:/fix: describing the API change.")
     return 0
