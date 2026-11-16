@@ -8,14 +8,14 @@ from __future__ import annotations
 import asyncio
 import time
 from collections.abc import Awaitable, Callable
-from typing import TYPE_CHECKING, TypeVar, Union
+from typing import TYPE_CHECKING, TypeVar
 
 if TYPE_CHECKING:
     from .._client import ArinaDocumentIntelligenceAPI, AsyncArinaDocumentIntelligenceAPI
     from ..types.extract_run import ExtractRun
     from ..types.parse_run import ParseRun
 
-    Run = Union[ExtractRun, ParseRun]
+    Run = ExtractRun | ParseRun
 
 RunT = TypeVar("RunT")
 
